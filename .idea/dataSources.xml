@@ -15,5 +15,12 @@
       <jdbc-url>jdbc:mariadb://localhost:3306/test0</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="sql6444708@sql6.freemysqlhosting.net" uuid="532b1417-6051-4176-a643-68dbe3586aa4">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://sql6.freemysqlhosting.net:3306/sql6444708</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
