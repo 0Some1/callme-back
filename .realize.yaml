@@ -1,0 +1,24 @@
+settings:
+  legacy:
+    force: false
+    interval: 0s
+schema:
+- name: callme
+  path: .
+  commands:
+    install:
+      status: true
+      method: go build -o /tmp/GoLand/___go_build_callme callme
+    run:
+      status: true
+      method: /tmp/GoLand/___go_build_callme
+
+  watcher:
+    extensions:
+    - go
+    paths:
+    - .
+    ignored_paths:
+    - .git
+    - .realize
+    - vendor
