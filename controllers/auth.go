@@ -34,8 +34,13 @@ func Register(c *fiber.Ctx) error {
 		return c.JSON(errors)
 	}
 
-	database.DB.Create(&user)
-
+	result := database.DB.Create(&user)
+	if result.Error != nil {
+		c.Status(fiber.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"message": "could not sign up this email",
+		})
+	}
 	err = setCookie(c, user)
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
