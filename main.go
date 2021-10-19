@@ -13,8 +13,8 @@ func main() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "*",
 		AllowCredentials: true,
+		AllowHeaders:     "Origin, Content-Type, Accept, application/json",
 	}))
 
 	api := app.Group("/api", func(ctx *fiber.Ctx) error {
