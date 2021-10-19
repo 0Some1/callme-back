@@ -125,6 +125,7 @@ func setCookie(c *fiber.Ctx, user models.User) error {
 		Expires:  time.Now().Add(time.Hour * 24),
 		HTTPOnly: true,
 		SameSite: "None",
+		Secure:   false,
 	}
 	c.Cookie(&cookie)
 
