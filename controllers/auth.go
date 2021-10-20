@@ -41,7 +41,8 @@ func Register(c *fiber.Ctx) error {
 			"message": "could not sign up this email",
 		})
 	}
-	err = setCookie(c, user)
+	cookie := setCookie(user)
+	c.Cookie(&cookie)
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
@@ -49,7 +50,12 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(user)
+	return c.JSON(fiber.Map{
+		"username": user.Username,
+		"email":    user.Email,
+		"token":    cookie.Value,
+	})
+
 }
 
 func Login(c *fiber.Ctx) error {
@@ -77,7 +83,9 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	err = setCookie(c, user)
+	cookie := setCookie(user)
+	c.Cookie(&cookie)
+
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
@@ -85,7 +93,11 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(user)
+	return c.JSON(fiber.Map{
+		"username": user.Username,
+		"email":    user.Email,
+		"token":    cookie.Value,
+	})
 }
 
 func AuthenticatedUser(c *fiber.Ctx) error {
@@ -113,12 +125,9 @@ func Logout(c *fiber.Ctx) error {
 	})
 }
 
-func setCookie(c *fiber.Ctx, user models.User) error {
-	token, err := utilities.GenerateJwt(strconv.Itoa(int(user.Id)))
+func setCookie(user models.User) fiber.Cookie {
+	token, _ := utilities.GenerateJwt(strconv.Itoa(int(user.Id)))
 
-	if err != nil {
-		return err
-	}
 	cookie := fiber.Cookie{
 		Name:     "jwt",
 		Value:    token,
@@ -127,7 +136,6 @@ func setCookie(c *fiber.Ctx, user models.User) error {
 		SameSite: "None",
 		Secure:   false,
 	}
-	c.Cookie(&cookie)
 
-	return nil
+	return cookie
 }
