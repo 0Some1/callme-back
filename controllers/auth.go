@@ -105,7 +105,7 @@ func Logout(c *fiber.Ctx) error {
 		Name:     "jwt",
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour),
-		HTTPOnly: true,
+		HTTPOnly: false,
 	}
 	c.Cookie(&cookie)
 	return c.JSON(fiber.Map{
@@ -123,9 +123,9 @@ func setCookie(c *fiber.Ctx, user models.User) error {
 		Name:     "jwt",
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 24),
-		HTTPOnly: true,
+		HTTPOnly: false,
 		SameSite: "None",
-		Secure:   true,
+		Secure:   false,
 	}
 	c.Cookie(&cookie)
 
