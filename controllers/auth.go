@@ -4,7 +4,6 @@ import (
 	"callme/database"
 	"callme/models"
 	"callme/utilities"
-	"callme/utilities/validators"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 	"strconv"
@@ -29,7 +28,7 @@ func Register(c *fiber.Ctx) error {
 		Email:     data["email"],
 	}
 
-	errors := validators.ValidateStruct(user)
+	errors := utilities.ValidateStruct(user)
 	if errors != nil {
 		return c.JSON(errors)
 	}
