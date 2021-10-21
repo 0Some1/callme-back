@@ -1,8 +1,8 @@
 package database
 
 import (
-	"callme/config"
 	"callme/models"
+	"callme/utilities"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -13,11 +13,11 @@ var DB *gorm.DB
 func Connect() {
 
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
-		config.Config("DB_USER"),
-		config.Config("DB_PASSWORD"),
-		config.Config("DB_HOST"),
-		config.Config("DB_PORT"),
-		config.Config("DB_NAME"))
+		utilities.Config("DB_USER"),
+		utilities.Config("DB_PASSWORD"),
+		utilities.Config("DB_HOST"),
+		utilities.Config("DB_PORT"),
+		utilities.Config("DB_NAME"))
 
 	database, err := gorm.Open(mysql.Open(dns), &gorm.Config{})
 	if err != nil {

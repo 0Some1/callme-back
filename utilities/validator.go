@@ -1,14 +1,14 @@
-package validators
+package utilities
 
 import (
 	"callme/models"
 	"github.com/go-playground/validator/v10"
 )
 
-func ValidateStruct(user models.User) []*models.ErrorResponse {
+func ValidateStruct(s interface{}) []*models.ErrorResponse {
 	var errors []*models.ErrorResponse
 	validate := validator.New()
-	err := validate.Struct(user)
+	err := validate.Struct(s)
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
 			var element models.ErrorResponse
