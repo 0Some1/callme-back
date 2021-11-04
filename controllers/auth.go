@@ -2,139 +2,98 @@ package controllers
 
 import (
 	"callme/database"
+	"callme/lib"
 	"callme/models"
-	"callme/utilities"
+	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"strconv"
-	"time"
+	"gorm.io/gorm"
 )
 
 func Register(c *fiber.Ctx) error {
-	var data map[string]string
-
-	err := c.BodyParser(&data)
+	var user models.User
+	err := c.BodyParser(&user)
 	if err != nil {
-		return err
+		fmt.Println("RegisterController - BodyParser - ", err)
+		c.Status(fiber.ErrNotAcceptable.Code)
+		return c.JSON(lib.CustomError(fiber.ErrNotAcceptable, "can't read body as JSON!"))
 	}
 
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+	password, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	if err != nil {
+		fmt.Println("RegisterController - GenerateFromPassword - ", err)
+		c.Status(fiber.ErrInternalServerError.Code)
+		return c.JSON(lib.CustomError(fiber.ErrInternalServerError, ""))
+	}
+	user.Password = string(password)
 
-	user := models.User{
-		FirstName: data["first_name"],
-		LastName:  data["last_name"],
-		Password:  password,
-		Username:  data["username"],
-		Email:     data["email"],
+	validationErrors := lib.ValidateStruct(user)
+	if validationErrors != nil {
+		return c.Status(fiber.ErrForbidden.Code).JSON(validationErrors)
 	}
 
-	errors := utilities.ValidateStruct(user)
-	if errors != nil {
-		return c.JSON(errors)
+	err = database.DB.CreateUser(&user)
+	if err != nil {
+		fmt.Println("RegisterController - createUser - ", err)
+		c.Status(fiber.ErrNotAcceptable.Code)
+		return c.JSON(lib.CustomError(fiber.ErrNotAcceptable, "the email must be unique!"))
 	}
 
-	result := database.DB.Create(&user)
-	if result.Error != nil {
-		c.Status(fiber.StatusInternalServerError)
-		return c.JSON(fiber.Map{
-			"message": "could not sign up this email",
-		})
+	cookie, err := lib.SetCookie(user.ID)
+	if err != nil {
+		fmt.Println("RegisterController - setCookie - ", err)
+		c.Status(fiber.ErrInternalServerError.Code)
+		return c.JSON(lib.CustomError(fiber.ErrInternalServerError, ""))
 	}
-	cookie := setCookie(user)
 	c.Cookie(&cookie)
-	if err != nil {
-		c.Status(fiber.StatusInternalServerError)
-		return c.JSON(fiber.Map{
-			"message": "could not set the cookie!",
-		})
-	}
 
-	return c.JSON(fiber.Map{
-		"username": user.Username,
-		"email":    user.Email,
-		"token":    cookie.Value,
+	return c.Status(201).JSON(fiber.Map{
+		"token": cookie.Value,
 	})
 
 }
 
 func Login(c *fiber.Ctx) error {
-	var data map[string]string
-
-	err := c.BodyParser(&data)
+	var userIn models.User
+	err := c.BodyParser(&userIn)
 	if err != nil {
-		return err
+		fmt.Println("LoginController - BodyParser - ", err)
+		c.Status(fiber.ErrNotAcceptable.Code)
+		return c.JSON(lib.CustomError(fiber.ErrNotAcceptable, "can't read body as JSON!"))
 	}
 
-	var user models.User
-	database.DB.Where("email = ?", data["email"]).First(&user)
-
-	if user.Id == 0 {
-		c.Status(404)
-		return c.JSON(fiber.Map{
-			"message": "user could not be found!",
-		})
-	}
-	err = bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"]))
+	user, err := database.DB.GetUserByEmail(userIn.Email)
 	if err != nil {
-		c.Status(400)
-		return c.JSON(fiber.Map{
-			"message": "incorrect password!",
-		})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			fmt.Println("LoginController - First - ", err)
+			c.Status(fiber.ErrNotFound.Code)
+			return c.JSON(lib.CustomError(fiber.ErrNotFound, "user not found!"))
+		}
+		fmt.Println("LoginController - First - ", err)
+		c.Status(fiber.ErrInternalServerError.Code)
+		return c.JSON(lib.CustomError(fiber.ErrInternalServerError, ""))
 	}
 
-	cookie := setCookie(user)
+	if user.ID == 0 {
+		c.Status(fiber.ErrNotFound.Code)
+		return c.JSON(lib.CustomError(fiber.ErrNotFound, "User not found!"))
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userIn.Password))
+	if err != nil {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(lib.CustomError(fiber.ErrUnauthorized, "Password is incorrect!"))
+	}
+
+	cookie, err := lib.SetCookie(user.ID)
+	if err != nil {
+		fmt.Println("RegisterController - setCookie - ", err)
+		c.Status(fiber.ErrInternalServerError.Code)
+		return c.JSON(lib.CustomError(fiber.ErrInternalServerError, ""))
+	}
 	c.Cookie(&cookie)
 
-	if err != nil {
-		c.Status(fiber.StatusInternalServerError)
-		return c.JSON(fiber.Map{
-			"message": "could not set the cookie!",
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"username": user.Username,
-		"email":    user.Email,
-		"token":    cookie.Value,
+	return c.Status(200).JSON(fiber.Map{
+		"token": cookie.Value,
 	})
-}
-
-func AuthenticatedUser(c *fiber.Ctx) error {
-	cookie := c.Cookies("jwt")
-
-	id, _ := utilities.ParseJwt(cookie)
-
-	var user models.User
-
-	database.DB.Where("id = ?", id).First(&user)
-
-	return c.JSON(user)
-}
-
-func Logout(c *fiber.Ctx) error {
-	cookie := fiber.Cookie{
-		Name:     "jwt",
-		Value:    "",
-		Expires:  time.Now().Add(-time.Hour),
-		HTTPOnly: false,
-	}
-	c.Cookie(&cookie)
-	return c.JSON(fiber.Map{
-		"message": "success",
-	})
-}
-
-func setCookie(user models.User) fiber.Cookie {
-	token, _ := utilities.GenerateJwt(strconv.Itoa(int(user.Id)))
-
-	cookie := fiber.Cookie{
-		Name:     "jwt",
-		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 24),
-		HTTPOnly: false,
-		SameSite: "None",
-		Secure:   false,
-	}
-
-	return cookie
 }

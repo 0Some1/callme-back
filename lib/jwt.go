@@ -1,6 +1,7 @@
-package utilities
+package lib
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -8,12 +9,19 @@ import (
 const SecretKey = "salty"
 
 func GenerateJwt(issuer string) (string, error) {
+
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    issuer,
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // it will be last for 1 day
 	})
 
-	return claims.SignedString([]byte(SecretKey))
+	token, err := claims.SignedString([]byte(SecretKey))
+	if err != nil {
+		fmt.Print("lib.GenerateJwt - ")
+		return "", err
+	}
+
+	return token, nil
 
 }
 
@@ -24,6 +32,7 @@ func ParseJwt(cookie string) (string, error) {
 	})
 
 	if err != nil || !token.Valid {
+		fmt.Print("lib.ParseJwt - ")
 		return "", err
 	}
 	claims := token.Claims.(*jwt.StandardClaims)
