@@ -22,5 +22,12 @@
       <jdbc-url>jdbc:mysql://sql6.freemysqlhosting.net:3306/sql6444708</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="d81qeubd4hcutu@ec2-54-74-77-126.eu-west-1.compute.amazonaws.com" uuid="2e929e88-6522-4304-a041-eb046ee1dd68">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ec2-54-74-77-126.eu-west-1.compute.amazonaws.com:5432/d81qeubd4hcutu</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
