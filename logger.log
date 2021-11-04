@@ -1,0 +1,7 @@
+[04:19:14] 406 - 2.368783401s [92m POST [0m /api/register
+[93m reqBody: {
+    "email":"testa143@hsad.com",
+    "username":"hdaskjhdsakh",
+    "password":"khjkdsahjhds"
+}
+[95m resBody: {"status":406,"title":"Not Acceptable","description":"couldn't save user in database!"} [0m[04:19:14] 406 - 2.368866141s POST /api/register
