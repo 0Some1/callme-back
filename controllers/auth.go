@@ -20,6 +20,11 @@ func Register(c *fiber.Ctx) error {
 		return c.JSON(lib.CustomError(fiber.ErrNotAcceptable, "can't read body as JSON!"))
 	}
 
+	validationErrors := lib.ValidateRegister(user)
+	if validationErrors != nil {
+		return c.Status(fiber.ErrForbidden.Code).JSON(validationErrors)
+	}
+
 	password, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	if err != nil {
 		fmt.Println("RegisterController - GenerateFromPassword - ", err)
@@ -27,11 +32,6 @@ func Register(c *fiber.Ctx) error {
 		return c.JSON(lib.CustomError(fiber.ErrInternalServerError, ""))
 	}
 	user.Password = string(password)
-
-	validationErrors := lib.ValidateStruct(user)
-	if validationErrors != nil {
-		return c.Status(fiber.ErrForbidden.Code).JSON(validationErrors)
-	}
 
 	err = database.DB.CreateUser(&user)
 	if err != nil {

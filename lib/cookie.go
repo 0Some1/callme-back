@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
+	"time"
 )
 
 func SetCookie(id uint) (fiber.Cookie, error) {
@@ -18,6 +19,7 @@ func SetCookie(id uint) (fiber.Cookie, error) {
 		HTTPOnly: false,
 		SameSite: "None",
 		Secure:   false,
+		Expires:  time.Now().Add(time.Hour * 24 * 9999),
 	}
 
 	return cookie, nil

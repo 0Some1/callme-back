@@ -25,3 +25,12 @@ func (p *postgresDB) GetUserByEmail(email string) (*models.User, error) {
 	err := p.db.Where("email = ?", email).First(&user).Error
 	return user, err
 }
+func (p *postgresDB) PreloadFollowers(user *models.User) error {
+	err := p.db.Preload("Followers").Where("id = ?", user.ID).Find(&user).Error
+	return err
+}
+
+func (p *postgresDB) PreloadFollowings(user *models.User) error {
+	err := p.db.Preload("Followings").Where("id = ?", user.ID).Find(&user).Error
+	return err
+}

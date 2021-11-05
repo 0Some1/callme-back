@@ -1,17 +1,23 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type User struct {
 	gorm.Model
-	Username    string `validate:"required,min=3,max=32" json:"username,omitempty"`
-	FirstName   string `json:"first_name,omitempty"`
-	LastName    string `json:"last_name,omitempty"`
-	Email       string `gorm:"unique" validate:"required,email,max=32" json:"email"`
-	Password    string `validate:"required" json:"password"`
-	Post        []Post `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	followerID  *uint
-	followingID *uint
-	followers   []User `gorm:"foreignkey:followerID"`
-	followings  []User `gorm:"foreignkey:followingID"`
+	Username   string     `json:"username,omitempty" gorm:"unique" validate:"required,min=3"`
+	Name       string     `json:"name,omitempty"`
+	Email      string     `json:"email,omitempty" gorm:"unique" validate:"required,email"`
+	Password   string     `json:"password,omitempty" validate:"required,min=8"`
+	Country    string     `json:"country"  validate:"required"`
+	City       string     `json:"city" validate:"required"`
+	Born       *time.Time `json:"born" validate:"required"`
+	Avatar     string     `json:"avatar" validate:"required"`
+	Bio        string     `json:"bio" validate:"required"`
+	Post       []*Post    `json:"post,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Request    []*Request `json:"request,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Followers  []*User    `gorm:"many2many:user_follower;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"followers"`
+	Followings []*User    `gorm:"many2many:user_following;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"followings"`
 }
