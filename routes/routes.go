@@ -11,4 +11,5 @@ func Setup(api fiber.Router) {
 	api.Post("/login", controllers.Login)
 	api.Use(middlewares.IsAuthenticated)
 	api.Get("/profile", controllers.GetUser)
+	api.Get("/posts", controllers.GetPosts)
 }

@@ -10,7 +10,6 @@ import (
 
 func GetUser(c *fiber.Ctx) error {
 	user := c.Locals("user").(*models.User)
-	user.Password = ""
 	err := database.DB.PreloadFollowers(user)
 	if err != nil {
 		fmt.Println("GetUser - ", err)

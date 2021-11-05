@@ -2,6 +2,7 @@ package main
 
 import (
 	"callme/database"
+	"callme/lib"
 	"callme/routes"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -27,7 +28,7 @@ func main() {
 	routes.Setup(api)
 
 	app.All("*", func(c *fiber.Ctx) error {
-		return fiber.ErrNotFound
+		return c.Status(404).JSON(lib.CustomError(fiber.ErrNotFound, "Not Found"))
 	})
 
 	port := os.Getenv("PORT")
