@@ -1,19 +1,23 @@
 package lib
 
 import (
+	"callme/models"
 	"github.com/go-playground/validator/v10"
 )
 
-func ValidateStruct(s interface{}) []*ErrorResponse {
+func ValidateRegister(user models.User) []*ErrorResponse {
 	var errors []*ErrorResponse
 	validate := validator.New()
-	err := validate.Struct(s)
+	err := validate.StructPartial(user, "Password", "Email", "Username")
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
 			var element ErrorResponse
 			element.Status = 403
-			element.Title = "Validation failed!"
-			element.Description = err.StructField() + " is not valid!"
+			element.Title = err.StructField() + " validation failed!"
+			element.Description = "condition: " + err.Tag()
+			if err.Param() != "" {
+				element.Description = "condition: " + err.Tag() + " = " + err.Param()
+			}
 			errors = append(errors, &element)
 		}
 	}
