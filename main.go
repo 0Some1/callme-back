@@ -12,7 +12,9 @@ import (
 
 func main() {
 	database.Connect()
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: lib.CustomErrorHandler,
+	})
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "*",
@@ -25,7 +27,13 @@ func main() {
 		return ctx.Next()
 	})
 
+	file := app.Group("/uploads", func(ctx *fiber.Ctx) error {
+		return ctx.Next()
+	})
+
 	routes.Setup(api)
+
+	routes.File(file)
 
 	app.All("*", func(c *fiber.Ctx) error {
 		return c.Status(404).JSON(lib.CustomError(fiber.ErrNotFound, "Not Found"))

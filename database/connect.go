@@ -40,6 +40,7 @@ func migration(db *gorm.DB) {
 		&models.Post{},
 		&models.Request{},
 		&models.Comment{},
+		&models.Photo{},
 	)
 
 }

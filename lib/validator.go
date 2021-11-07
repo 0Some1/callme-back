@@ -13,10 +13,9 @@ func ValidateRegister(user models.User) []*ErrorResponse {
 		for _, err := range err.(validator.ValidationErrors) {
 			var element ErrorResponse
 			element.Status = 403
-			element.Title = err.StructField() + " validation failed!"
-			element.Description = "condition: " + err.Tag()
+			element.Description = "validation failed in condition: " + err.Tag()
 			if err.Param() != "" {
-				element.Description = "condition: " + err.Tag() + " = " + err.Param()
+				element.Description = "validation failed condition: " + err.Tag() + " = " + err.Param()
 			}
 			errors = append(errors, &element)
 		}

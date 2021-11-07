@@ -46,7 +46,6 @@ func Register(c *fiber.Ctx) error {
 		c.Status(fiber.ErrInternalServerError.Code)
 		return c.JSON(lib.CustomError(fiber.ErrInternalServerError, ""))
 	}
-	c.Cookie(&cookie)
 
 	return c.Status(201).JSON(fiber.Map{
 		"token": cookie.Value,
@@ -91,7 +90,6 @@ func Login(c *fiber.Ctx) error {
 		c.Status(fiber.ErrInternalServerError.Code)
 		return c.JSON(lib.CustomError(fiber.ErrInternalServerError, ""))
 	}
-	c.Cookie(&cookie)
 
 	return c.Status(200).JSON(fiber.Map{
 		"token": cookie.Value,
