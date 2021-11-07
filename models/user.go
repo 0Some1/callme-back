@@ -16,8 +16,8 @@ type User struct {
 	Born       *time.Time `json:"born" validate:"required"`
 	Avatar     string     `json:"avatar" validate:"required"`
 	Bio        string     `json:"bio" validate:"required"`
-	Post       []*Post    `json:"post,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Request    []*Request `json:"request,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Posts      []*Post    `json:"post,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Requests   []*Request `json:"request,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Followers  []*User    `gorm:"many2many:user_follower;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"followers"`
 	Followings []*User    `gorm:"many2many:user_following;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"followings"`
 }

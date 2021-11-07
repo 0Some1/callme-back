@@ -5,9 +5,10 @@ import "gorm.io/gorm"
 type Post struct {
 	gorm.Model
 	UserID      uint
-	Title       string `json:"title"`
-	Photos      string `json:"photos"`
-	Description string `json:"description"`
-	Likes       []User `gorm:"many2many:user_like;"`
-	Comments    []Comment
+	Private     *bool     `json:"private,omitempty" gorm:"type:bool;default:false"`
+	Title       string    `json:"title,omitempty"`
+	Photos      []Photo   `json:"photos,omitempty" gorm:"foreignKey:UserID"`
+	Description string    `json:"description,omitempty"`
+	Likes       []User    `gorm:"many2many:user_like;"`
+	Comments    []Comment `json:"comments,omitempty"`
 }
