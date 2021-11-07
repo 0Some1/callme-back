@@ -2,3 +2,10 @@
 logger.log
 .ideagit
 .idea
+# exclude everything
+uploads/post/*
+uploads/profile/*
+
+# exception to the rule
+!uploads/post/.gitkeep
+!uploads/profile/.gitkeep
