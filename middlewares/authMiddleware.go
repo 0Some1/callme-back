@@ -6,10 +6,14 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"strings"
 )
 
 func IsAuthenticated(c *fiber.Ctx) error {
-	cookie := c.Cookies("jwt")
+	cookie := c.Get("Authorization")
+	if len(strings.Split(cookie, " ")) > 1 {
+		cookie = strings.Split(cookie, " ")[1]
+	}
 
 	id, err := lib.ParseJwt(cookie)
 	if err != nil {

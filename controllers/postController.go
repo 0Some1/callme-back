@@ -31,9 +31,10 @@ func CreatePost(c *fiber.Ctx) error {
 	if form, err := c.MultipartForm(); err == nil {
 		files := form.File["photos"]
 		for _, file := range files {
+
 			photoTemp := models.Photo{
 				Name: file.Filename,
-				Path: "/uploads/" + file.Filename,
+				Path: "/uploads/post" + file.Filename,
 			}
 			photos = append(photos, photoTemp)
 			err := database.DB.CreatePhoto(&photoTemp)
