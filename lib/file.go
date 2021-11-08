@@ -16,11 +16,11 @@ func ImageValidation(file *multipart.FileHeader) error {
 	return nil
 }
 
-func AvatarFileName(username string, fileName string) string {
+func GenFileName(identifier string, fileName string) string {
 	temp := strings.Split(fileName, ".")
 	if len(temp) < 2 {
-		return time.Now().Format("2006-01-02_15:04:05") + "_" + username + "_" + fileName
+		return time.Now().Format("2006-01-02_15:04:05") + "_" + identifier + "_" + fileName
 	}
 	t := temp[len(temp)-1]
-	return time.Now().Format("2006-01-02_15:04:05") + "_" + username + "." + t
+	return time.Now().Format("2006-01-02_15:04:05") + "_" + identifier + "." + t
 }
