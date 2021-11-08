@@ -109,10 +109,10 @@ func UpdateAvatar(c *fiber.Ctx) error {
 	err = lib.ImageValidation(file)
 	if err != nil {
 		fmt.Println("UpdateAvatar - image - ", err)
-		return c.Status(fiber.ErrBadRequest.Code).JSON(lib.CustomError(fiber.ErrBadRequest, err.Error()))
+		return c.Status(fiber.ErrUnprocessableEntity.Code).JSON(lib.CustomError(fiber.ErrUnprocessableEntity, err.Error()))
 	}
 
-	file.Filename = lib.AvatarFileName(user.Username, file.Filename)
+	file.Filename = lib.GenFileName(user.Username, file.Filename)
 
 	err = c.SaveFile(file, fmt.Sprintf("./uploads/profile/%s", file.Filename))
 	if err != nil {
