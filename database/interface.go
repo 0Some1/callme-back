@@ -13,4 +13,6 @@ type databaseInterface interface {
 	PreloadPosts(user *models.User) error
 	CreatePost(post *models.Post) error
 	CreatePhoto(photo *models.Photo) error
+	GetPostByID(postID string) (*models.Post, error)
+	GetPostByPhotoName(photoName string) (*models.Post, error)
 }
