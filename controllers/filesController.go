@@ -9,3 +9,11 @@ func GetProfileImage(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func GetPostImage(c *fiber.Ctx) error {
+	err := c.SendFile("./uploads/posts/" + c.Params("filename"))
+	if err != nil {
+		return fiber.ErrNotFound
+	}
+	return nil
+}
