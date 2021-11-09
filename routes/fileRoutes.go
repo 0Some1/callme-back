@@ -9,4 +9,5 @@ import (
 func File(file fiber.Router) {
 	file.Use(middlewares.IsAuthenticated)
 	file.Get("/profile/:filename", controllers.GetProfileImage)
+	file.Get("/post/:filename", controllers.GetPostImage)
 }
