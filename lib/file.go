@@ -2,9 +2,10 @@ package lib
 
 import (
 	"errors"
+	"github.com/google/uuid"
+	_ "github.com/google/uuid"
 	"mime/multipart"
 	"strings"
-	"time"
 )
 
 func ImageValidation(file *multipart.FileHeader) error {
@@ -16,11 +17,11 @@ func ImageValidation(file *multipart.FileHeader) error {
 	return nil
 }
 
-func GenFileName(identifier string, fileName string) string {
+func GenFileName(fileName string) string {
 	temp := strings.Split(fileName, ".")
-	if len(temp) < 2 {
-		return time.Now().Format("2006-01-02_15:04:05") + "_" + identifier + "_" + fileName
+	fileExtention := ""
+	if len(temp) > 1 {
+		fileExtention = temp[len(temp)-1]
 	}
-	t := temp[len(temp)-1]
-	return time.Now().Format("2006-01-02_15:04:05") + "_" + identifier + "." + t
+	return uuid.New().String() + "." + fileExtention
 }
