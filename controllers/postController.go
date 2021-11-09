@@ -71,5 +71,9 @@ func CreatePost(c *fiber.Ctx) error {
 		fmt.Println("CreatePost - SavePost -", err)
 		return fiber.ErrInternalServerError
 	}
+
+	for i := 0; i < len(post.Photos); i++ {
+		post.Photos[i].Path = c.BaseURL() + post.Photos[i].Path
+	}
 	return c.JSON(post)
 }
