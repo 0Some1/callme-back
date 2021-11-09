@@ -112,7 +112,7 @@ func UpdateAvatar(c *fiber.Ctx) error {
 		return c.Status(fiber.ErrUnprocessableEntity.Code).JSON(lib.CustomError(fiber.ErrUnprocessableEntity, err.Error()))
 	}
 
-	file.Filename = lib.GenFileName(user.Username, file.Filename)
+	file.Filename = lib.GenFileName(file.Filename)
 
 	err = c.SaveFile(file, fmt.Sprintf("./uploads/profile/%s", file.Filename))
 	if err != nil {

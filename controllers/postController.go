@@ -45,7 +45,7 @@ func CreatePost(c *fiber.Ctx) error {
 				fmt.Println("CreatePost - imageValidation -", err)
 				return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
 			}
-			file.Filename = lib.GenFileName(post.Title, file.Filename)
+			file.Filename = lib.GenFileName(file.Filename)
 			err = c.SaveFile(file, fmt.Sprintf("./uploads/post/%s", file.Filename))
 			if err != nil {
 				fmt.Println("CreatePost - saveFile ", err)
@@ -64,6 +64,10 @@ func CreatePost(c *fiber.Ctx) error {
 
 		}
 
+	}
+
+	for i := 0; i < len(photos); i++ {
+		photos[i].Path = c.BaseURL() + photos[i].Path
 	}
 	post.Photos = photos
 	err = database.DB.CreatePost(post)

@@ -3,6 +3,7 @@ package database
 import (
 	"callme/models"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 type postgresDB struct {
@@ -53,4 +54,18 @@ func (p *postgresDB) CreatePost(post *models.Post) error {
 
 func (p *postgresDB) CreatePhoto(photo *models.Photo) error {
 	return p.db.Create(photo).Error
+}
+
+func (p *postgresDB) GetPostByID(postID string) (*models.Post, error) {
+	post := new(models.Post)
+	err := p.db.Where("id = ?", postID).First(&post).Error
+	return post, err
+}
+
+func (p *postgresDB) GetPostByPhotoName(photoName string) (*models.Post, error) {
+	//I didn't read the whole doc of gorm, but it must be a better way to do this
+	photo := new(models.Photo)
+	err := p.db.Model(&models.Photo{}).Where("name = ? ", photoName).Find(&photo).Error
+	post, err := p.GetPostByID(strconv.Itoa(int(photo.PostID)))
+	return post, err
 }

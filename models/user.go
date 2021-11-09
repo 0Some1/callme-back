@@ -21,3 +21,12 @@ type User struct {
 	Followers  []*User    `gorm:"many2many:user_follower;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"followers"`
 	Followings []*User    `gorm:"many2many:user_following;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"followings"`
 }
+
+func (u User) IsFollowing(id uint) bool {
+	for _, user := range u.Followings {
+		if user.ID == id {
+			return true
+		}
+	}
+	return false
+}
