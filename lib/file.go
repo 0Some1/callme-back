@@ -14,6 +14,10 @@ func ImageValidation(file *multipart.FileHeader) error {
 	if !strings.HasPrefix(fileType, "image/") {
 		return errors.New("file is not an image")
 	}
+	//check size of file
+	if file.Size > 5000000 {
+		return errors.New("file is too large")
+	}
 	return nil
 }
 
