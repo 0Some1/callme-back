@@ -38,7 +38,7 @@ func GetUser(c *fiber.Ctx) error {
 		"born":             user.Born,
 		"created_at":       user.CreatedAt,
 		"bio":              user.Bio,
-		"avatar":           user.Avatar,
+		"avatar":           c.BaseURL() + user.Avatar,
 		"city":             user.City,
 		"country":          user.Country,
 	})
