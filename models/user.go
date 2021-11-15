@@ -30,3 +30,12 @@ func (u User) IsFollowing(id uint) bool {
 	}
 	return false
 }
+
+func (u *User) PrepareUser(baseurl string) {
+	u.Password = ""
+	u.Followers = nil
+	u.Followings = nil
+	if u.Avatar != "" {
+		u.Avatar = baseurl + u.Avatar
+	}
+}

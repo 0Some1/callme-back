@@ -28,6 +28,12 @@ func (p *postgresDB) GetUserByID(userID string) (*models.User, error) {
 	return user, err
 }
 
+func (p *postgresDB) SearchUsers(search string) ([]*models.User, error) {
+	users := make([]*models.User, 0)
+	err := p.db.Where("name LIKE ?", "%"+search+"%").Or("username LIKE ?", "%"+search+"%").Find(&users).Error
+	return users, err
+}
+
 func (p *postgresDB) GetUserByEmail(email string) (*models.User, error) {
 	user := new(models.User)
 	err := p.db.Where("email = ?", email).First(&user).Error

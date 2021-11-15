@@ -15,12 +15,12 @@ func GetUser(c *fiber.Ctx) error {
 	err := database.DB.PreloadFollowers(user)
 	if err != nil {
 		fmt.Println("GetUser - ", err)
-		c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
 	}
 	err = database.DB.PreloadFollowings(user)
 	if err != nil {
 		fmt.Println("GetUser - ", err)
-		c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
 	}
 	var followers int
 	var followings int
@@ -133,4 +133,16 @@ func UpdateAvatar(c *fiber.Ctx) error {
 	return c.Status(201).JSON(fiber.Map{
 		"avatar": c.BaseURL() + user.Avatar,
 	})
+}
+func SearchUsers(c *fiber.Ctx) error {
+	q := c.Query("q")
+	users, err := database.DB.SearchUsers(q)
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
+	for i := 0; i < len(users); i++ {
+		users[i].PrepareUser(c.BaseURL())
+	}
+
+	return c.JSON(users)
 }
