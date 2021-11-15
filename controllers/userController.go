@@ -134,3 +134,15 @@ func UpdateAvatar(c *fiber.Ctx) error {
 		"avatar": c.BaseURL() + user.Avatar,
 	})
 }
+func SearchUsers(c *fiber.Ctx) error {
+	q := c.Query("q")
+	users, err := database.DB.SearchUsers(q)
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
+	for i := 0; i < len(users); i++ {
+		users[i].PrepareUser(c.BaseURL())
+	}
+
+	return c.JSON(users)
+}
