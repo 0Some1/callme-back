@@ -15,12 +15,12 @@ func GetUser(c *fiber.Ctx) error {
 	err := database.DB.PreloadFollowers(user)
 	if err != nil {
 		fmt.Println("GetUser - ", err)
-		c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
 	}
 	err = database.DB.PreloadFollowings(user)
 	if err != nil {
 		fmt.Println("GetUser - ", err)
-		c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
 	}
 	var followers int
 	var followings int
