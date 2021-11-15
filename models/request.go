@@ -5,14 +5,6 @@ import "gorm.io/gorm"
 type Request struct {
 	gorm.Model
 	UserID   uint
-	Follower User `gorm:"foreignkey:UserID"`
-	state
+	Follower User `gorm:"foreignKey:UserID"`
+	Accepted bool `gorm:"type:bool;default:false"`
 }
-
-type state int
-
-const (
-	declined state = iota
-	accepted
-	pending
-)

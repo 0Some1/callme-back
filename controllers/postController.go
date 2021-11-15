@@ -27,7 +27,7 @@ func CreatePost(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 	//post validation must be done here!!!
-	err = validator.New().Struct(post)
+	err = validator.New().StructPartial(post, "Title", "Description")
 	if err != nil {
 		fmt.Println("CreatePost - Validation - ", err)
 		return fiber.ErrBadRequest

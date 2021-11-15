@@ -24,11 +24,14 @@ func GetUser(c *fiber.Ctx) error {
 	}
 	var followers int
 	var followings int
-
 	followers = len(user.Followers)
 	followings = len(user.Followings)
 	user.Followers = nil
 	user.Followings = nil
+	if user.Avatar != "" {
+		user.Avatar = c.BaseURL() + user.Avatar
+	}
+
 	return c.JSON(fiber.Map{
 		"name":             user.Name,
 		"username":         user.Username,
@@ -38,7 +41,7 @@ func GetUser(c *fiber.Ctx) error {
 		"born":             user.Born,
 		"created_at":       user.CreatedAt,
 		"bio":              user.Bio,
-		"avatar":           c.BaseURL() + user.Avatar,
+		"avatar":           user.Avatar,
 		"city":             user.City,
 		"country":          user.Country,
 	})
