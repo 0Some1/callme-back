@@ -2,6 +2,7 @@ package database
 
 import (
 	"callme/models"
+	"errors"
 	"gorm.io/gorm"
 	"strconv"
 )
@@ -74,4 +75,37 @@ func (p *postgresDB) GetPostByPhotoName(photoName string) (*models.Post, error) 
 	err := p.db.Model(&models.Photo{}).Where("name = ? ", photoName).Find(&photo).Error
 	post, err := p.GetPostByID(strconv.Itoa(int(photo.PostID)))
 	return post, err
+}
+func (p *postgresDB) GetRequests(id string) ([]*models.Request, error) {
+	requests := make([]*models.Request, 0)
+	err := p.db.Where("user_id = ?", id).Preload("Follower").Find(&requests).Error
+	return requests, err
+}
+func (p *postgresDB) GetRequestByID(userID uint, requestUserID string) (*models.Request, int) {
+	request := new(models.Request)
+	err := p.db.Where("user_id = ? AND follower_id = ?", requestUserID, userID).First(&request).RowsAffected
+	return request, int(err)
+}
+func (p *postgresDB) CreateRequest(userID uint, requestUserID string) (*models.Request, error) {
+	request := new(models.Request)
+	//first must check if the request already exists
+	request, rowsAffected := p.GetRequestByID(userID, requestUserID)
+	if rowsAffected != 0 {
+		return nil, errors.New("request already exists")
+	}
+	//and if the user the requested user exists too
+	requestedUser, err := p.GetUserByID(requestUserID)
+	if err != nil {
+		return nil, err
+	}
+	//then create the request
+	request.FollowerID = userID
+	requestedUser.Requests = append(requestedUser.Requests, request)
+	err = p.db.Save(requestedUser).Error
+	return request, err
+}
+
+func (p *postgresDB) DeleteRequest(reqID string) error {
+	err := p.db.Unscoped().Delete(&models.Request{}, reqID).Error
+	return err
 }
