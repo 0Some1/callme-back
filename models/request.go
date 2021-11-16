@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Request struct {
 	gorm.Model
-	UserID   uint
-	Follower User `gorm:"foreignKey:UserID"`
-	Accepted bool `gorm:"type:bool;default:false"`
+	UserID     uint `json:"-"`
+	FollowerID uint `json:"-"`
+	Follower   User ` json:"follower" gorm:"foreignKey:FollowerID"`
 }
