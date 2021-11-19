@@ -109,3 +109,8 @@ func (p *postgresDB) DeleteRequest(reqID string) error {
 	err := p.db.Unscoped().Delete(&models.Request{}, reqID).Error
 	return err
 }
+
+func (p *postgresDB) PreLoadPhotos(post *models.Post) error {
+	err := p.db.Preload("Photos").Where("id = ?", post.ID).Find(&post).Error
+	return err
+}
