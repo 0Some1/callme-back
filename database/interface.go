@@ -20,5 +20,4 @@ type databaseInterface interface {
 	GetRequestByID(userID uint, requestUserID string) (*models.Request, int)
 	CreateRequest(userID uint, requestUserID string) (*models.Request, error)
 	DeleteRequest(requestUserID string) error
-	PreLoadPhotos(post *models.Post) error
 }

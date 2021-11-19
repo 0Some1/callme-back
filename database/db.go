@@ -51,7 +51,7 @@ func (p *postgresDB) PreloadFollowings(user *models.User) error {
 }
 
 func (p *postgresDB) PreloadPosts(user *models.User) error {
-	err := p.db.Preload("Posts").Where("id = ?", user.ID).Find(&user).Error
+	err := p.db.Preload("Posts.Photos").Where("id = ?", user.ID).Find(&user).Error
 	return err
 }
 
