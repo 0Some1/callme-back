@@ -12,7 +12,7 @@ func GenerateJwt(issuer string) (string, error) {
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    issuer,
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // it will be last for 1 day
+		ExpiresAt: time.Now().Add(time.Hour * 99999).Unix(), // it will be last for 1 day
 	})
 
 	token, err := claims.SignedString([]byte(SecretKey))

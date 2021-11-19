@@ -16,6 +16,7 @@ func GetPosts(c *fiber.Ctx) error {
 		fmt.Println("GetPosts - ", err)
 		return fiber.ErrInternalServerError
 	}
+
 	for _, post := range user.Posts {
 		post.PreparePost(c.BaseURL())
 	}
@@ -78,9 +79,8 @@ func CreatePost(c *fiber.Ctx) error {
 		fmt.Println("CreatePost - SavePost -", err)
 		return fiber.ErrInternalServerError
 	}
-
-	for i := 0; i < len(post.Photos); i++ {
-		post.Photos[i].Path = c.BaseURL() + post.Photos[i].Path
-	}
+  
+	post.PreparePost(c.BaseURL())
+  
 	return c.JSON(post)
 }
