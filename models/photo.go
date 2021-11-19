@@ -8,3 +8,7 @@ type Photo struct {
 	Name   string `json:"name"`
 	Path   string `json:"path"`
 }
+
+func (p *Photo) AddBaseURL(baseURL string) {
+	p.Path = baseURL + p.Path
+}
