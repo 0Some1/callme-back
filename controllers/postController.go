@@ -79,6 +79,8 @@ func CreatePost(c *fiber.Ctx) error {
 		fmt.Println("CreatePost - SavePost -", err)
 		return fiber.ErrInternalServerError
 	}
+  
 	post.PreparePost(c.BaseURL())
+  
 	return c.JSON(post)
 }
