@@ -13,3 +13,9 @@ type Post struct {
 	Likes       []User    `json:"likes,omitempty" gorm:"many2many:user_like;"`
 	Comments    []Comment `json:"comments,omitempty"`
 }
+
+func (p *Post) PreparePost(baseURL string) {
+	for i := range p.Photos {
+		p.Photos[i].AddBaseURL(baseURL)
+	}
+}
