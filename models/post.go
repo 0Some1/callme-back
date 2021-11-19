@@ -7,7 +7,7 @@ type Post struct {
 	UserID      uint
 	Private     *bool     `json:"private,omitempty" gorm:"type:bool;default:false"`
 	Title       string    `json:"title,omitempty" validate:"required"`
-	Photos      []Photo   `json:"photos,omitempty" gorm:"foreignKey:PostID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;preload:true"`
+	Photos      []*Photo  `json:"photos,omitempty" gorm:"foreignKey:PostID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;preload:true"`
 	Description string    `json:"description,omitempty" validate:"required"`
 	Keywords    string    `json:"keywords,omitempty" validate:"required"`
 	Likes       []User    `json:"likes,omitempty" gorm:"many2many:user_like;"`
