@@ -16,6 +16,9 @@ func GetPosts(c *fiber.Ctx) error {
 		fmt.Println("GetPosts - ", err)
 		return fiber.ErrInternalServerError
 	}
+	for _, post := range user.Posts {
+		post.PreparePost(c.BaseURL())
+	}
 	return c.JSON(user.Posts)
 }
 func CreatePost(c *fiber.Ctx) error {
@@ -35,7 +38,7 @@ func CreatePost(c *fiber.Ctx) error {
 
 	post.UserID = user.ID
 
-	var photos []models.Photo
+	var photos []*models.Photo
 
 	if form, err := c.MultipartForm(); err == nil {
 		files := form.File["photos"]
@@ -55,7 +58,7 @@ func CreatePost(c *fiber.Ctx) error {
 				Name: file.Filename,
 				Path: "/uploads/post/" + file.Filename,
 			}
-			photos = append(photos, photoTemp)
+			photos = append(photos, &photoTemp)
 			err := database.DB.CreatePhoto(&photoTemp)
 			if err != nil {
 				fmt.Println("CreatePost - createPhoto -", err)
