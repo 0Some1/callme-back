@@ -156,7 +156,7 @@ func UpdateAvatar(c *fiber.Ctx) error {
 
 	if err != nil {
 		fmt.Println("UpdateAvatar - file - ", err)
-		return fiber.ErrInternalServerError
+		return fiber.ErrBadRequest
 	}
 
 	err = lib.ImageValidation(file)
