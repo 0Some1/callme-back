@@ -14,6 +14,7 @@ func Setup(api fiber.Router) {
 
 	//profile or user routes
 	api.Get("/profile", controllers.GetUser)
+	api.Get("/profile/:id", controllers.GetUserByID)
 	api.Patch("/Profile", controllers.UpdateUser)
 	api.Delete("/Profile", controllers.DeleteUser)
 	api.Put("/avatar", controllers.UpdateAvatar)

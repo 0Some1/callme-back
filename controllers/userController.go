@@ -4,9 +4,11 @@ import (
 	"callme/database"
 	"callme/lib"
 	"callme/models"
+	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 	"strings"
 )
 
@@ -15,12 +17,59 @@ func GetUser(c *fiber.Ctx) error {
 	err := database.DB.PreloadFollowers(user)
 	if err != nil {
 		fmt.Println("GetUser - ", err)
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return fiber.ErrInternalServerError
 	}
 	err = database.DB.PreloadFollowings(user)
 	if err != nil {
 		fmt.Println("GetUser - ", err)
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return fiber.ErrInternalServerError
+	}
+	var followers int
+	var followings int
+	followers = len(user.Followers)
+	followings = len(user.Followings)
+	user.Followers = nil
+	user.Followings = nil
+	if user.Avatar != "" {
+		user.Avatar = c.BaseURL() + user.Avatar
+	}
+
+	return c.JSON(fiber.Map{
+		"id":               user.ID,
+		"name":             user.Name,
+		"username":         user.Username,
+		"email":            user.Email,
+		"followers_count":  followers,
+		"followings_count": followings,
+		"born":             user.Born,
+		"created_at":       user.CreatedAt,
+		"bio":              user.Bio,
+		"avatar":           user.Avatar,
+		"city":             user.City,
+		"country":          user.Country,
+	})
+}
+func GetUserByID(c *fiber.Ctx) error {
+	user, err := database.DB.GetUserByID(c.Params("id"))
+	if err != nil {
+		fmt.Println("GetUserByID - ", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fiber.NewError(404, "User not found")
+		} else if strings.Contains(err.Error(), "invalid") {
+			return fiber.NewError(400, "invalid user id")
+		}
+		return fiber.ErrInternalServerError
+
+	}
+	err = database.DB.PreloadFollowers(user)
+	if err != nil {
+		fmt.Println("GetUser - ", err)
+		return fiber.ErrInternalServerError
+	}
+	err = database.DB.PreloadFollowings(user)
+	if err != nil {
+		fmt.Println("GetUser - ", err)
+		return fiber.ErrInternalServerError
 	}
 	var followers int
 	var followings int
@@ -84,10 +133,10 @@ func UpdateUser(c *fiber.Ctx) error {
 	err = database.DB.SaveUser(user)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate") {
-			return c.Status(fiber.ErrConflict.Code).JSON(lib.CustomError(fiber.ErrConflict, "username or email already exists"))
+			return fiber.NewError(fiber.StatusConflict, "Username or Email already exists")
 		}
 		fmt.Println("UpdateUser - saveUser", err)
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return fiber.ErrInternalServerError
 	}
 	return c.Status(204).JSON(nil)
 }
@@ -96,7 +145,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	err := database.DB.DeleteUser(user)
 	if err != nil {
 		fmt.Println("DeleteUser - ", err)
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return fiber.ErrInternalServerError
 	}
 	return c.Status(204).JSON(nil)
 }
@@ -107,7 +156,7 @@ func UpdateAvatar(c *fiber.Ctx) error {
 
 	if err != nil {
 		fmt.Println("UpdateAvatar - file - ", err)
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return fiber.ErrInternalServerError
 	}
 
 	err = lib.ImageValidation(file)
@@ -121,14 +170,14 @@ func UpdateAvatar(c *fiber.Ctx) error {
 	err = c.SaveFile(file, fmt.Sprintf("./uploads/profile/%s", file.Filename))
 	if err != nil {
 		fmt.Println("UpdateAvatar - saveFile - ", err)
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return fiber.ErrInternalServerError
 	}
 
 	user.Avatar = "/uploads/profile/" + file.Filename
 	err = database.DB.SaveUser(user)
 	if err != nil {
 		fmt.Println("UpdateAvatar - saveUser - ", err)
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
+		return fiber.ErrInternalServerError
 	}
 
 	return c.Status(201).JSON(fiber.Map{
@@ -137,13 +186,17 @@ func UpdateAvatar(c *fiber.Ctx) error {
 }
 func SearchUsers(c *fiber.Ctx) error {
 	q := c.Query("q")
+	localUser := c.Locals("user").(*models.User)
 	users, err := database.DB.SearchUsers(q)
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}
 	for i := 0; i < len(users); i++ {
 		users[i].PrepareUser(c.BaseURL())
+		if users[i].ID == localUser.ID {
+			users = append(users[:i], users[i+1:]...)
+			i--
+		}
 	}
-
 	return c.JSON(users)
 }
