@@ -31,7 +31,7 @@ func (p *postgresDB) GetUserByID(userID string) (*models.User, error) {
 
 func (p *postgresDB) SearchUsers(search string) ([]*models.User, error) {
 	users := make([]*models.User, 0)
-	err := p.db.Where("name LIKE ?", "%"+search+"%").Or("username LIKE ?", "%"+search+"%").Preload("Photos").Find(&users).Error
+	err := p.db.Where("name LIKE ?", "%"+search+"%").Or("username LIKE ?", "%"+search+"%").Find(&users).Error
 	return users, err
 }
 
