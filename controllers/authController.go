@@ -37,7 +37,7 @@ func Register(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println("RegisterController - createUser - ", err)
 		c.Status(fiber.ErrNotAcceptable.Code)
-		return c.JSON(lib.CustomError(fiber.ErrNotAcceptable, "the email must be unique!"))
+		return c.JSON(lib.CustomError(fiber.ErrNotAcceptable, "the email and username must be unique!"))
 	}
 
 	cookie, err := lib.SetCookie(user.ID)
