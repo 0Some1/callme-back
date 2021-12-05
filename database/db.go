@@ -114,3 +114,40 @@ func (p *postgresDB) PreLoadPhotos(post *models.Post) error {
 	err := p.db.Preload("Photos").Where("id = ?", post.ID).Find(&post).Error
 	return err
 }
+
+func (p *postgresDB) AcceptRequest(requestID string, user *models.User) error {
+	request := new(models.Request)
+	err := p.db.Where("id = ?", requestID).First(&request).Error
+	if err != nil {
+		return err
+	}
+	if user.ID != request.UserID {
+		return errors.New("you are not the owner of this request")
+	}
+	err = p.FollowByID(request.Follower.ID, user.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FollowByID userID is the user who is following otherUserID
+func (p *postgresDB) FollowByID(userID uint, otherUserID uint) error {
+	user, err := p.GetUserByID(strconv.Itoa(int(userID)))
+	if err != nil {
+		return err
+	}
+	otherUser, err := p.GetUserByID(strconv.Itoa(int(otherUserID)))
+	if err != nil {
+		return err
+	}
+	user.Followings = append(user.Followings, otherUser)
+	otherUser.Followers = append(otherUser.Followers, user)
+	err = p.db.Save(user).Error
+	if err != nil {
+		return err
+	}
+	err = p.db.Save(otherUser).Error
+	return err
+}
