@@ -9,18 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetPosts(c *fiber.Ctx) error {
-	user := c.Locals("user").(*models.User)
-	err := database.DB.PreloadPosts(user)
-	if err != nil {
-		fmt.Println("GetPosts - ", err)
-		return fiber.ErrInternalServerError
-	}
-	for _, post := range user.Posts {
-		post.PreparePost(c.BaseURL())
-	}
-	return c.JSON(user.Posts)
-}
 func CreatePost(c *fiber.Ctx) error {
 	user := c.Locals("user").(*models.User)
 	post := new(models.Post)
@@ -79,4 +67,46 @@ func CreatePost(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 	return c.JSON(post)
+}
+
+func GetPosts(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	err := database.DB.PreloadPosts(user)
+	if err != nil {
+		fmt.Println("GetPosts - ", err)
+		return fiber.ErrInternalServerError
+	}
+	for _, post := range user.Posts {
+		post.PreparePost(c.BaseURL())
+	}
+	return c.JSON(user.Posts)
+}
+
+func GetPostsByUserID(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	userID := c.Params("userID")
+	otherUser, err := database.DB.GetUserByID(userID)
+	if err != nil {
+		fmt.Println("GetPostsByUserID - GetUserByID  ", err)
+		return fiber.ErrNotFound
+	}
+	err = database.DB.PreloadFollowings(user)
+	if err != nil {
+		fmt.Println("GetPostsByUserID - PreloadFollowings  ", err)
+		return fiber.ErrInternalServerError
+	}
+	err = database.DB.PreloadPosts(otherUser)
+	if err != nil {
+		fmt.Println("GetPostsByUserID - PreloadPosts  ", err)
+		return fiber.ErrInternalServerError
+	}
+
+	if user.IsFollowing(otherUser.ID) {
+		return c.JSON(otherUser.Posts)
+	}
+
+	otherUser.RemovePrivatePosts()
+
+	return c.JSON(otherUser.Posts)
+
 }
