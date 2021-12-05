@@ -23,6 +23,7 @@ func Setup(api fiber.Router) {
 	//post routes
 	api.Get("/posts", controllers.GetPosts)
 	api.Post("/post", controllers.CreatePost)
+	api.Get("/posts/userID", controllers.GetPostsByUserID)
 
 	//request routes
 	api.Get("/requests", controllers.GetRequests)
