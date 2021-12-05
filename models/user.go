@@ -41,8 +41,8 @@ func (u *User) PrepareUser(baseurl string) {
 }
 
 func (u *User) RemovePrivatePosts() {
-	for i, post := range u.Posts {
-		if *post.Private {
+	for i := 0; i < len(u.Posts); i++ {
+		if *u.Posts[i].Private {
 			u.Posts = append(u.Posts[:i], u.Posts[i+1:]...)
 		}
 	}
