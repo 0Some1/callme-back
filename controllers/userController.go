@@ -81,6 +81,26 @@ func GetUserByID(c *fiber.Ctx) error {
 		user.Avatar = c.BaseURL() + user.Avatar
 	}
 
+	localUser := c.Locals("user").(*models.User)
+	err = database.DB.PreloadFollowings(localUser)
+	if err != nil {
+		fmt.Println("GetUser - PreloadFollowings ", err)
+		return fiber.ErrInternalServerError
+	}
+	followingStatus := "not_following"
+	if user.IsFollowing(user.ID) {
+		followingStatus = "following"
+	}
+
+	err = database.DB.PreloadRequests(user)
+	if err != nil {
+		fmt.Println("GetUserByID - GetRequests ", err)
+		return fiber.ErrInternalServerError
+	}
+	if user.IsRequestedByUser(localUser.ID) {
+		followingStatus = "requested"
+	}
+
 	return c.JSON(fiber.Map{
 		"id":               user.ID,
 		"name":             user.Name,
@@ -94,6 +114,7 @@ func GetUserByID(c *fiber.Ctx) error {
 		"avatar":           user.Avatar,
 		"city":             user.City,
 		"country":          user.Country,
+		"following_status": followingStatus,
 	})
 }
 func UpdateUser(c *fiber.Ctx) error {

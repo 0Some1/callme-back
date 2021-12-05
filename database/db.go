@@ -8,7 +8,7 @@ import (
 )
 
 type postgresDB struct {
-	databaseInterface
+	DatabaseInterface
 	db *gorm.DB
 }
 
@@ -31,7 +31,7 @@ func (p *postgresDB) GetUserByID(userID string) (*models.User, error) {
 
 func (p *postgresDB) SearchUsers(search string) ([]*models.User, error) {
 	users := make([]*models.User, 0)
-	err := p.db.Where("name LIKE ?", "%"+search+"%").Or("username LIKE ?", "%"+search+"%").Find(&users).Error
+	err := p.db.Where("lower(name) LIKE ?", "%"+search+"%").Or("lower(username) LIKE ?", "%"+search+"%").Find(&users).Error
 	return users, err
 }
 
@@ -52,6 +52,11 @@ func (p *postgresDB) PreloadFollowings(user *models.User) error {
 
 func (p *postgresDB) PreloadPosts(user *models.User) error {
 	err := p.db.Preload("Posts.Photos").Where("id = ?", user.ID).Find(&user).Error
+	return err
+}
+
+func (p *postgresDB) PreloadRequests(user *models.User) error {
+	err := p.db.Preload("Requests.Follower").Where("id = ?", user.ID).Find(&user).Error
 	return err
 }
 
@@ -113,4 +118,44 @@ func (p *postgresDB) DeleteRequest(reqID string) error {
 func (p *postgresDB) PreLoadPhotos(post *models.Post) error {
 	err := p.db.Preload("Photos").Where("id = ?", post.ID).Find(&post).Error
 	return err
+}
+
+func (p *postgresDB) AcceptRequest(requestID string, user *models.User) error {
+	request := new(models.Request)
+	err := p.db.Where("id = ?", requestID).First(&request).Error
+	if err != nil {
+		return err
+	}
+	if user.ID != request.UserID {
+		return errors.New("you are not the owner of this request")
+	}
+	err = p.FollowByID(request.FollowerID, user.ID)
+	if err != nil {
+		return err
+	}
+	err = p.DeleteRequest(requestID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// FollowByID userID is the user who is following otherUserID
+func (p *postgresDB) FollowByID(userID uint, otherUserID uint) error {
+	user, err := p.GetUserByID(strconv.Itoa(int(userID)))
+	if err != nil {
+		return err
+	}
+	otherUser, err := p.GetUserByID(strconv.Itoa(int(otherUserID)))
+	if err != nil {
+		return err
+	}
+	p.db.Table("user_following").Create([]map[string]interface{}{
+		{"user_id": user.ID, "following_id": otherUser.ID},
+	})
+	p.db.Table("user_follower").Create([]map[string]interface{}{
+		{"user_id": otherUser.ID, "follower_id": user.ID},
+	})
+
+	return nil
 }

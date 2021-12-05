@@ -39,3 +39,19 @@ func (u *User) PrepareUser(baseurl string) {
 		u.Avatar = baseurl + u.Avatar
 	}
 }
+
+func (u *User) RemovePrivatePosts() {
+	for i, post := range u.Posts {
+		if *post.Private {
+			u.Posts = append(u.Posts[:i], u.Posts[i+1:]...)
+		}
+	}
+}
+func (u User) IsRequestedByUser(followerID uint) bool {
+	for _, request := range u.Requests {
+		if request.FollowerID == followerID {
+			return true
+		}
+	}
+	return false
+}
