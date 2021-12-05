@@ -2,7 +2,7 @@ package database
 
 import "callme/models"
 
-type databaseInterface interface {
+type DatabaseInterface interface {
 	CreateUser(user *models.User) error
 	SaveUser(user *models.User) error
 	DeleteUser(user *models.User) error
@@ -19,5 +19,7 @@ type databaseInterface interface {
 	GetRequests(id string) ([]*models.Request, error)
 	GetRequestByID(userID uint, requestUserID string) (*models.Request, int)
 	CreateRequest(userID uint, requestUserID string) (*models.Request, error)
-	DeleteRequest(requestUserID string) error
+	DeleteRequest(requestID string) error
+	AcceptRequest(requestID string, user *models.User) error
+	FollowByID(userID uint, otherUserID uint) error
 }
