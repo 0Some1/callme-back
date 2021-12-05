@@ -102,6 +102,10 @@ func GetPostsByUserID(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
+	for _, post := range otherUser.Posts {
+		post.PreparePost(c.BaseURL())
+	}
+
 	if user.IsFollowing(otherUser.ID) {
 		return c.JSON(otherUser.Posts)
 	}
