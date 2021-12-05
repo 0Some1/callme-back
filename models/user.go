@@ -47,3 +47,11 @@ func (u *User) RemovePrivatePosts() {
 		}
 	}
 }
+func (u User) IsRequestedByUser(followerID uint) bool {
+	for _, request := range u.Requests {
+		if request.FollowerID == followerID {
+			return true
+		}
+	}
+	return false
+}

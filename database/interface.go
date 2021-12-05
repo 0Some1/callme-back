@@ -12,6 +12,7 @@ type DatabaseInterface interface {
 	PreloadFollowers(user *models.User) error
 	PreloadFollowings(user *models.User) error
 	PreloadPosts(user *models.User) error
+	PreloadRequests(user *models.User) error
 	CreatePost(post *models.Post) error
 	CreatePhoto(photo *models.Photo) error
 	GetPostByID(postID string) (*models.Post, error)

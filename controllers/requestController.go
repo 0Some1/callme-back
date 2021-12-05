@@ -61,7 +61,7 @@ func AcceptRequest(c *fiber.Ctx) error {
 	err := database.DB.AcceptRequest(requestID, user)
 	if err != nil {
 		fmt.Println("acceptRequestController - acceptReqDB - ", err)
-		return fiber.ErrInternalServerError
+		return fiber.ErrBadRequest
 	}
 	return c.Status(204).JSON(nil)
 }

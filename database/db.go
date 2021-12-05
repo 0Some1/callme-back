@@ -55,6 +55,11 @@ func (p *postgresDB) PreloadPosts(user *models.User) error {
 	return err
 }
 
+func (p *postgresDB) PreloadRequests(user *models.User) error {
+	err := p.db.Preload("Requests.Follower").Where("id = ?", user.ID).Find(&user).Error
+	return err
+}
+
 func (p *postgresDB) CreatePost(post *models.Post) error {
 	return p.db.Create(post).Error
 }
@@ -124,11 +129,14 @@ func (p *postgresDB) AcceptRequest(requestID string, user *models.User) error {
 	if user.ID != request.UserID {
 		return errors.New("you are not the owner of this request")
 	}
-	err = p.FollowByID(request.Follower.ID, user.ID)
+	err = p.FollowByID(request.FollowerID, user.ID)
 	if err != nil {
 		return err
 	}
-
+	err = p.DeleteRequest(requestID)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -142,12 +150,12 @@ func (p *postgresDB) FollowByID(userID uint, otherUserID uint) error {
 	if err != nil {
 		return err
 	}
-	user.Followings = append(user.Followings, otherUser)
-	otherUser.Followers = append(otherUser.Followers, user)
-	err = p.db.Save(user).Error
-	if err != nil {
-		return err
-	}
-	err = p.db.Save(otherUser).Error
-	return err
+	p.db.Table("user_following").Create([]map[string]interface{}{
+		{"user_id": user.ID, "following_id": otherUser.ID},
+	})
+	p.db.Table("user_follower").Create([]map[string]interface{}{
+		{"user_id": otherUser.ID, "follower_id": user.ID},
+	})
+
+	return nil
 }
