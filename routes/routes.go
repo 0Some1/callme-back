@@ -28,6 +28,6 @@ func Setup(api fiber.Router) {
 	//request routes
 	api.Get("/requests", controllers.GetRequests)
 	api.Post("/request/:id", controllers.CreateRequest)
-	api.Delete("/request/:id", controllers.DeleteRequest)
+	api.Delete("/request/:userID", controllers.DeleteRequest)
 	api.Get("/request/:id/accept", controllers.AcceptRequest)
 }

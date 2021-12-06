@@ -46,10 +46,14 @@ func CreateRequest(c *fiber.Ctx) error {
 }
 
 func DeleteRequest(c *fiber.Ctx) error {
-	requestID := c.Params("id")
-	err := database.DB.DeleteRequest(requestID)
+	otherUserID := c.Params("userID")
+	user := c.Locals("user").(*models.User)
+	rowsAffected, err := database.DB.DeleteRequest(user.ID, otherUserID)
 	if err != nil {
 		fmt.Println("deleteRequestController - deleteReqDB - ", err)
+		if rowsAffected == 0 {
+			return fiber.NewError(fiber.StatusBadRequest, "Request not found")
+		}
 		return fiber.ErrInternalServerError
 	}
 	return c.Status(204).JSON(nil)
