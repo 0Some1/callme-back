@@ -86,6 +86,8 @@ func (p *postgresDB) GetRequests(id string) ([]*models.Request, error) {
 	err := p.db.Where("user_id = ?", id).Preload("Follower").Find(&requests).Error
 	return requests, err
 }
+
+// GetRequestByID returns the request that created before from userID to requestUserID
 func (p *postgresDB) GetRequestByID(userID uint, requestUserID string) (*models.Request, int) {
 	request := new(models.Request)
 	err := p.db.Where("user_id = ? AND follower_id = ?", requestUserID, userID).First(&request).RowsAffected
@@ -110,9 +112,13 @@ func (p *postgresDB) CreateRequest(userID uint, requestUserID string) (*models.R
 	return request, err
 }
 
-func (p *postgresDB) DeleteRequest(reqID string) error {
-	err := p.db.Unscoped().Delete(&models.Request{}, reqID).Error
-	return err
+func (p *postgresDB) DeleteRequest(userID uint, otherUserID string) (int64, error) {
+	request, rows := p.GetRequestByID(userID, otherUserID)
+	if rows == 0 {
+		return 0, errors.New("request not found")
+	}
+	err := p.db.Unscoped().Delete(request)
+	return err.RowsAffected, err.Error
 }
 
 func (p *postgresDB) PreLoadPhotos(post *models.Post) error {
@@ -133,7 +139,7 @@ func (p *postgresDB) AcceptRequest(requestID string, user *models.User) error {
 	if err != nil {
 		return err
 	}
-	err = p.DeleteRequest(requestID)
+	err = p.db.Unscoped().Delete(&request).Error
 	if err != nil {
 		return err
 	}
