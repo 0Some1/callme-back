@@ -88,7 +88,7 @@ func GetUserByID(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 	followingStatus := "not_following"
-	if user.IsFollowing(user.ID) {
+	if localUser.IsFollowing(user.ID) {
 		followingStatus = "following"
 	}
 
