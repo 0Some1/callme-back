@@ -225,10 +225,12 @@ func UnfollowUser(c *fiber.Ctx) error {
 	localUser := c.Locals("user").(*models.User)
 	otherUser, err := database.DB.GetUserByID(c.Params("id"))
 	if err != nil {
+		fmt.Println("UnfollowUser - GetUserByID ", err)
 		return fiber.NewError(404, "User not found")
 	}
 	err = database.DB.Unfollow(localUser, otherUser)
 	if err != nil {
+		fmt.Println("UnfollowUser - Unfollow -", err)
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	return c.Status(204).JSON(nil)
