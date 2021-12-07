@@ -165,3 +165,16 @@ func (p *postgresDB) FollowByID(userID uint, otherUserID uint) error {
 
 	return nil
 }
+func (p *postgresDB) Unfollow(user *models.User, otherUser *models.User) error {
+
+	err := p.db.Table("user_following").Delete([]map[string]interface{}{
+		{"user_id": user.ID, "following_id": otherUser.ID},
+	})
+	err2 := p.db.Table("user_follower").Delete([]map[string]interface{}{
+		{"user_id": otherUser.ID, "follower_id": user.ID},
+	})
+	if err.Error != nil || err2.Error != nil || err.RowsAffected == 0 || err2.RowsAffected == 0 {
+		return errors.New("error unfollowing! maybe you are not following this user")
+	}
+	return nil
+}

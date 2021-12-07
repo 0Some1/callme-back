@@ -19,6 +19,7 @@ func Setup(api fiber.Router) {
 	api.Delete("/Profile", controllers.DeleteUser)
 	api.Put("/avatar", controllers.UpdateAvatar)
 	api.Get("/search", controllers.SearchUsers)
+	api.Get("/unfollow/:id", controllers.UnfollowUser)
 
 	//post routes
 	api.Get("/posts", controllers.GetPosts)
@@ -30,4 +31,5 @@ func Setup(api fiber.Router) {
 	api.Post("/request/:id", controllers.CreateRequest)
 	api.Delete("/request/:userID", controllers.DeleteRequest)
 	api.Get("/request/:id/accept", controllers.AcceptRequest)
+
 }
