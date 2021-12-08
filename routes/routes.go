@@ -20,8 +20,8 @@ func Setup(api fiber.Router) {
 	api.Put("/avatar", controllers.UpdateAvatar)
 	api.Get("/search", controllers.SearchUsers)
 	api.Get("/unfollow/:id", controllers.UnfollowUser)
-	api.Get("/profile/followers", controllers.GetFollowers)
-	api.Get("/profile/following", controllers.GetFollowings)
+	api.Get("/followers", controllers.GetFollowers)
+	api.Get("/following", controllers.GetFollowings)
 
 	//post routes
 	api.Get("/posts", controllers.GetPosts)
