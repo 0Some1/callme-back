@@ -146,6 +146,22 @@ func (p *postgresDB) AcceptRequest(requestID string, user *models.User) error {
 	return nil
 }
 
+func (p *postgresDB) DeclineRequest(requestID string, user *models.User) error {
+	request := new(models.Request)
+	err := p.db.Where("id = ?", requestID).First(&request).Error
+	if err != nil {
+		return err
+	}
+	if user.ID != request.UserID {
+		return errors.New("you are not the owner of this request")
+	}
+	err = p.db.Unscoped().Delete(&request).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // FollowByID userID is the user who is following otherUserID
 func (p *postgresDB) FollowByID(userID uint, otherUserID uint) error {
 	user, err := p.GetUserByID(strconv.Itoa(int(userID)))
