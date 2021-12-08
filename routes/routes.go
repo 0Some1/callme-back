@@ -31,5 +31,6 @@ func Setup(api fiber.Router) {
 	api.Post("/request/:id", controllers.CreateRequest)
 	api.Delete("/request/:userID", controllers.DeleteRequest)
 	api.Get("/request/:id/accept", controllers.AcceptRequest)
+	api.Get("/request/:id/decline", controllers.DeclineRequest)
 
 }
