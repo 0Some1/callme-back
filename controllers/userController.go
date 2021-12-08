@@ -235,3 +235,28 @@ func UnfollowUser(c *fiber.Ctx) error {
 	}
 	return c.Status(204).JSON(nil)
 }
+func GetFollowers(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	err := database.DB.PreloadFollowers(user)
+	if err != nil {
+		fmt.Println("GetFollowers - ", err)
+		return fiber.ErrInternalServerError
+	}
+	for i := 0; i < len(user.Followers); i++ {
+		user.Followers[i].PrepareUser(c.BaseURL())
+	}
+	return c.JSON(user.Followers)
+}
+
+func GetFollowings(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	err := database.DB.PreloadFollowings(user)
+	if err != nil {
+		fmt.Println("GetFollowers - ", err)
+		return fiber.ErrInternalServerError
+	}
+	for i := 0; i < len(user.Followings); i++ {
+		user.Followings[i].PrepareUser(c.BaseURL())
+	}
+	return c.JSON(user.Followings)
+}
