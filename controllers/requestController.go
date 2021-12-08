@@ -69,3 +69,14 @@ func AcceptRequest(c *fiber.Ctx) error {
 	}
 	return c.Status(204).JSON(nil)
 }
+
+func DeclineRequest(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	requestID := c.Params("id")
+	err := database.DB.AcceptRequest(requestID, user)
+	if err != nil {
+		fmt.Println("acceptRequestController - acceptReqDB - ", err)
+		return fiber.ErrBadRequest
+	}
+	return c.Status(204).JSON(nil)
+}
