@@ -22,6 +22,7 @@ type DatabaseInterface interface {
 	CreateRequest(userID uint, requestUserID string) (*models.Request, error)
 	DeleteRequest(userID uint, otherUserID string) (int64, error)
 	AcceptRequest(requestID string, user *models.User) error
+	DeclineRequest(requestID string, user *models.User) error
 	FollowByID(userID uint, otherUserID uint) error
 	Unfollow(user *models.User, otherUser *models.User) error
 }
