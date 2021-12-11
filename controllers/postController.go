@@ -149,8 +149,8 @@ func GetExplorePosts(c *fiber.Ctx) error {
 	user := c.Locals("user").(*models.User)
 
 	//pagination
-	resultsPerPage, err := strconv.Atoi(c.Params("resultsPerPage"))
-	page, err := strconv.Atoi(c.Params("page"))
+	resultsPerPage, err := strconv.Atoi(c.Query("resultsPerPage"))
+	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
 		return fiber.ErrBadRequest
 	}
