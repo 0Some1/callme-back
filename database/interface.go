@@ -18,6 +18,7 @@ type DatabaseInterface interface {
 	CreatePhoto(photo *models.Photo) error
 	GetPostByID(postID string) (*models.Post, error)
 	GetPostByPhotoName(photoName string) (*models.Post, error)
+	LoadExplorePosts(user *models.User, resultsPerPage int, page int) ([]*models.Post, error)
 	GetRequests(id string) ([]*models.Request, error)
 	GetRequestByID(userID uint, requestUserID string) (*models.Request, int)
 	CreateRequest(userID uint, requestUserID string) (*models.Request, error)
