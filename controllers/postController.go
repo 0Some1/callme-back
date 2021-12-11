@@ -5,6 +5,7 @@ import (
 	"callme/lib"
 	"callme/models"
 	"fmt"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -142,4 +143,25 @@ func GetPostsByUserID(c *fiber.Ctx) error {
 
 	return c.JSON(otherUser.Posts)
 
+}
+
+func GetExplorePosts(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+
+	//pagination
+	resultsPerPage, err := strconv.Atoi(c.Params("resultsPerPage"))
+	page, err := strconv.Atoi(c.Params("page"))
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+	if page <= 0 || resultsPerPage <= 0 {
+		return fiber.ErrBadRequest
+	}
+
+	posts, err := database.DB.LoadExplorePosts(user, resultsPerPage, page)
+	if err != nil {
+		fmt.Println("GetExplorePosts - PreloadPosts  ", err)
+		return fiber.ErrInternalServerError
+	}
+	return c.JSON(posts)
 }
