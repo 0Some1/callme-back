@@ -29,7 +29,7 @@ func Setup(api fiber.Router) {
 	api.Post("/post", controllers.CreatePost)
 	api.Delete("/post/:postID", controllers.DeletePost)
 	api.Get("/posts/:userID", controllers.GetPostsByUserID)
-	api.Get("/explore/:page/:resultsPerPage", controllers.GetExplorePosts)
+	api.Get("/explore", controllers.GetExplorePosts)
 
 	//request routes
 	api.Get("/requests", controllers.GetRequests)
