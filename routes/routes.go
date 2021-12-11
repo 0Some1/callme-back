@@ -3,6 +3,7 @@ package routes
 import (
 	"callme/controllers"
 	"callme/middlewares"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -26,6 +27,7 @@ func Setup(api fiber.Router) {
 	//post routes
 	api.Get("/posts", controllers.GetPosts)
 	api.Post("/post", controllers.CreatePost)
+	api.Delete("/post/:postID", controllers.DeletePost)
 	api.Get("/posts/:userID", controllers.GetPostsByUserID)
 
 	//request routes
