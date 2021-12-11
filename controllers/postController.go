@@ -5,6 +5,7 @@ import (
 	"callme/lib"
 	"callme/models"
 	"fmt"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
@@ -68,6 +69,33 @@ func CreatePost(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(post)
+}
+
+func DeletePost(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	postID := c.Params("postID")
+
+	//get post
+	post, err := database.DB.GetPostByID(postID)
+	//check if post exists
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "Post not found")
+	}
+	//check if user posted this post
+	if post.UserID != user.ID {
+		return fiber.NewError(fiber.StatusForbidden, "Can not delete this post")
+	}
+
+	//delete post from database
+	rowsAffected, err := database.DB.DeletePost(post)
+	if err != nil {
+		fmt.Println("deletePostController - deletePostDB - ", err)
+		if rowsAffected == 0 {
+			return fiber.NewError(fiber.StatusBadRequest, "Post not found")
+		}
+		return fiber.ErrInternalServerError
+	}
+	return c.Status(204).JSON(nil)
 }
 
 func GetPosts(c *fiber.Ctx) error {

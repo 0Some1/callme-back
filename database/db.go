@@ -3,8 +3,9 @@ package database
 import (
 	"callme/models"
 	"errors"
-	"gorm.io/gorm"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 type postgresDB struct {
@@ -62,6 +63,11 @@ func (p *postgresDB) PreloadRequests(user *models.User) error {
 
 func (p *postgresDB) CreatePost(post *models.Post) error {
 	return p.db.Create(post).Error
+}
+
+func (p *postgresDB) DeletePost(post *models.Post) (int64, error) {
+	err := p.db.Unscoped().Delete(&post)
+	return err.RowsAffected, err.Error
 }
 
 func (p *postgresDB) CreatePhoto(photo *models.Photo) error {
