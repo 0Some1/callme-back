@@ -238,3 +238,18 @@ func SetComment(c *fiber.Ctx) error {
 
 	return c.Status(204).JSON(nil)
 }
+
+//delete a comment from a post
+func DeleteComment(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	commentID := c.Params("commentID")
+
+	//delete the post
+	err := database.DB.DeleteComment(commentID, strconv.FormatUint(uint64(user.ID), 10))
+	if err != nil {
+		fmt.Println("DeleteComment - DeleteComment  ", err)
+		return fiber.ErrInternalServerError
+	}
+
+	return c.Status(204).JSON(nil)
+}
