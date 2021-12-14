@@ -1,8 +1,9 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -50,6 +51,15 @@ func (u *User) RemovePrivatePosts() {
 func (u User) IsRequestedByUser(followerID uint) bool {
 	for _, request := range u.Requests {
 		if request.FollowerID == followerID {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *User) HasLikedPost(likes []*User) bool {
+	for _, like := range likes {
+		if like.ID == u.ID {
 			return true
 		}
 	}

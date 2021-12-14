@@ -17,6 +17,7 @@ type DatabaseInterface interface {
 	DeletePost(post *models.Post) (int64, error)
 	CreatePhoto(photo *models.Photo) error
 	GetPostByID(postID string) (*models.Post, error)
+	PreloadPostByID(postID string) (*models.Post, error)
 	GetPostByPhotoName(photoName string) (*models.Post, error)
 	LoadExplorePosts(user *models.User, resultsPerPage int, page int) ([]*models.Post, error)
 	GetRequests(id string) ([]*models.Request, error)
