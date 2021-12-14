@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"callme/DTO"
 	"callme/database"
 	"callme/lib"
 	"callme/models"
@@ -145,6 +146,41 @@ func GetPostsByUserID(c *fiber.Ctx) error {
 
 }
 
+func GetPostDetails(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	postID := c.Params("postID")
+	//get the post
+	post, err := database.DB.PreloadPostByID(postID)
+	if err != nil {
+		fmt.Println("GetPostDetails - GetPostByID  ", err)
+		return fiber.ErrNotFound
+	}
+
+	//check if user has access to the post
+	if !user.IsFollowing(post.UserID) && *post.Private {
+		return fiber.NewError(fiber.StatusForbidden, "Can not get this post")
+	}
+
+	post.PreparePost(c.BaseURL())
+
+	comments := DTO.PrepareCommentDTO(user.ID, post.Comments)
+	hasLiked := user.HasLikedPost(post.Likes)
+
+	postDTO := DTO.PostDTO{
+		ID:          post.ID,
+		UserID:      post.UserID,
+		Title:       post.Title,
+		Photos:      post.Photos,
+		Description: post.Description,
+		Keywords:    post.Keywords,
+		Likes:       len(post.Likes),
+		HasLiked:    hasLiked,
+		Comments:    comments,
+	}
+
+	return c.JSON(postDTO)
+}
+
 func GetExplorePosts(c *fiber.Ctx) error {
 	user := c.Locals("user").(*models.User)
 
@@ -163,5 +199,6 @@ func GetExplorePosts(c *fiber.Ctx) error {
 		fmt.Println("GetExplorePosts - PreloadPosts  ", err)
 		return fiber.ErrInternalServerError
 	}
+
 	return c.JSON(posts)
 }
