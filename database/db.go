@@ -68,6 +68,11 @@ func (p *postgresDB) LoadExplorePosts(user *models.User, resultsPerPage int, pag
 	return posts, err
 }
 
+func (p *postgresDB) AddCommentToPost(comment *models.Comment) error {
+	err := p.db.Model(&models.Comment{}).Create(comment).Error
+	return err
+}
+
 func (p *postgresDB) PreloadRequests(user *models.User) error {
 	err := p.db.Preload("Requests.Follower").Where("id = ?", user.ID).Find(&user).Error
 	return err
