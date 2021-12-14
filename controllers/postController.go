@@ -202,3 +202,39 @@ func GetExplorePosts(c *fiber.Ctx) error {
 
 	return c.JSON(posts)
 }
+
+//set a comment on a post
+func SetComment(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	postID := c.Params("postID")
+
+	//get the post
+	post, err := database.DB.GetPostByID(postID)
+	if err != nil {
+		fmt.Println("SetComment - GetPost  ", err)
+		return fiber.ErrNotFound
+	}
+
+	//parse the comment
+	comment := new(models.Comment)
+	err = c.BodyParser(comment)
+	comment.UserID = user.ID
+	comment.PostID = post.ID
+	if err != nil {
+		fmt.Println("SetComment - Bodyparser - ", err)
+		return fiber.ErrBadRequest
+	}
+
+	//check if user has access to the post
+	if !user.IsFollowing(post.UserID) && *post.Private {
+		return fiber.NewError(fiber.StatusForbidden, "Can not comment on this post")
+	}
+
+	err = database.DB.AddCommentToPost(comment)
+	if err != nil {
+		fmt.Println("SetComment - AddCommentToPost - ", err)
+		return fiber.ErrInternalServerError
+	}
+
+	return c.Status(204).JSON(nil)
+}
