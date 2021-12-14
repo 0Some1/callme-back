@@ -92,6 +92,13 @@ func (p *postgresDB) GetPostByID(postID string) (*models.Post, error) {
 	return post, err
 }
 
+func (p *postgresDB) PreloadPostByID(postID string) (*models.Post, error) {
+	post := new(models.Post)
+	err := p.db.Preload("Photos").Preload("Comments").Preload("Likes").Where("id = ?", postID).
+		First(&post).Error
+	return post, err
+}
+
 func (p *postgresDB) GetPostByPhotoName(photoName string) (*models.Post, error) {
 	//I didn't read the whole doc of gorm, but it must be a better way to do this
 	photo := new(models.Photo)
