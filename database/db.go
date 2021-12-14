@@ -73,6 +73,11 @@ func (p *postgresDB) AddCommentToPost(comment *models.Comment) error {
 	return err
 }
 
+func (p *postgresDB) DeleteComment(commentID string, userID string) error {
+	err := p.db.Where("id = ? AND user_id = ?", commentID, userID).Delete(&models.Comment{}).Error
+	return err
+}
+
 func (p *postgresDB) PreloadRequests(user *models.User) error {
 	err := p.db.Preload("Requests.Follower").Where("id = ?", user.ID).Find(&user).Error
 	return err
