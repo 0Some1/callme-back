@@ -124,6 +124,18 @@ func (p *postgresDB) LikePost(postID string, userID string) error {
 	return err
 }
 
+func (p *postgresDB) UnlikePost(postID string, userID string) error {
+	err := p.db.Table("user_like").Where("user_id = ? AND post_id = ?", userID, postID).Unscoped().Delete([]map[string]interface{}{
+		{"post_id": postID, "user_id": userID},
+	})
+
+	if err.RowsAffected == 0 {
+		return errors.New("This post was not liked by this user")
+	}
+
+	return err.Error
+}
+
 func (p *postgresDB) GetRequests(id string) ([]*models.Request, error) {
 	requests := make([]*models.Request, 0)
 	err := p.db.Where("user_id = ?", id).Preload("Follower").Find(&requests).Error
