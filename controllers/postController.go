@@ -253,3 +253,16 @@ func DeleteComment(c *fiber.Ctx) error {
 
 	return c.Status(204).JSON(nil)
 }
+
+func LikePost(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	postID := c.Params("postID")
+
+	err := database.DB.LikePost(postID, strconv.FormatUint(uint64(user.ID), 10))
+	if err != nil {
+		fmt.Println("LikePost - LikePost  ", err)
+		return fiber.ErrInternalServerError
+	}
+
+	return c.Status(204).JSON(nil)
+}
