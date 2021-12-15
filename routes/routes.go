@@ -36,6 +36,9 @@ func Setup(api fiber.Router) {
 	api.Post("/comment/:postID", controllers.SetComment)
 	api.Delete("/comment/:commentID", controllers.DeleteComment)
 
+	//like routes
+	api.Post("/like/:postID", controllers.LikePost)
+
 	//request routes
 	api.Get("/requests", controllers.GetRequests)
 	api.Post("/request/:id", controllers.CreateRequest)

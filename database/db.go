@@ -116,6 +116,14 @@ func (p *postgresDB) GetPostByPhotoName(photoName string) (*models.Post, error) 
 	post, err := p.GetPostByID(strconv.Itoa(int(photo.PostID)))
 	return post, err
 }
+
+func (p *postgresDB) LikePost(postID string, userID string) error {
+	err := p.db.Table("user_like").Create([]map[string]interface{}{
+		{"post_id": postID, "user_id": userID},
+	}).Error
+	return err
+}
+
 func (p *postgresDB) GetRequests(id string) ([]*models.Request, error) {
 	requests := make([]*models.Request, 0)
 	err := p.db.Where("user_id = ?", id).Preload("Follower").Find(&requests).Error

@@ -22,6 +22,7 @@ type DatabaseInterface interface {
 	LoadExplorePosts(user *models.User, resultsPerPage int, page int) ([]*models.Post, error)
 	AddCommentToPost(comment *models.Comment) error
 	DeleteComment(commentID string) error
+	LikePost(postID string, userID string) error
 	GetRequests(id string) ([]*models.Request, error)
 	GetRequestByID(userID uint, requestUserID string) (*models.Request, int)
 	CreateRequest(userID uint, requestUserID string) (*models.Request, error)
