@@ -31,6 +31,7 @@ func Setup(api fiber.Router) {
 	api.Get("/posts/:userID", controllers.GetPostsByUserID)
 	api.Get("/explore", controllers.GetExplorePosts)
 	api.Get("/post/:postID", controllers.GetPostDetails)
+	api.Put("/post/:postID", controllers.EditPost)
 
 	//comment routes
 	api.Post("/comment/:postID", controllers.SetComment)
