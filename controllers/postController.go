@@ -73,6 +73,63 @@ func CreatePost(c *fiber.Ctx) error {
 	return c.JSON(post)
 }
 
+func EditPost(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	postID := c.Params("postID")
+	newPost := new(models.Post)
+	err := c.BodyParser(newPost)
+
+	if err != nil {
+		fmt.Println("EditPost - Bodyparser - ", err)
+		return fiber.ErrBadRequest
+	}
+	//post validation must be done here!!!
+	err = validator.New().StructPartial(newPost, "Title", "Description")
+	if err != nil {
+		fmt.Println("EditPost - Validation - ", err)
+		return fiber.ErrBadRequest
+	}
+
+	oldPost, err := database.DB.GetPostByID(postID)
+	if err != nil {
+		fmt.Println("EditPost - Get old post - ", err)
+		return fiber.ErrInternalServerError
+	}
+
+	//check if user posted this post
+	if oldPost.UserID != user.ID {
+		return fiber.NewError(fiber.StatusForbidden, "This user is not the owner of the post.")
+	}
+
+	postDetails := map[string]interface{}{
+		"Title":       newPost.Title,
+		"Description": newPost.Description,
+		"Private":     newPost.Private,
+		"Keywords":    newPost.Keywords,
+	}
+
+	if postDetails["Title"] == "" {
+		postDetails["Title"] = oldPost.Title
+	}
+	if postDetails["Description"] == "" {
+		postDetails["Description"] = oldPost.Description
+	}
+	if postDetails["Keywords"] == "" {
+		postDetails["Keywords"] = oldPost.Keywords
+	}
+	if postDetails["Private"] == "" {
+		postDetails["Private"] = oldPost.Keywords
+	}
+	err = database.DB.EditPost(postID, &postDetails)
+	if err != nil {
+		fmt.Println("EditPost - EditPost -", err)
+		return fiber.ErrInternalServerError
+	}
+
+	return c.Status(204).JSON(nil)
+
+}
+
 func DeletePost(c *fiber.Ctx) error {
 	user := c.Locals("user").(*models.User)
 	postID := c.Params("postID")
