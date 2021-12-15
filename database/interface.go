@@ -14,6 +14,7 @@ type DatabaseInterface interface {
 	PreloadPosts(user *models.User) error
 	PreloadRequests(user *models.User) error
 	CreatePost(post *models.Post) error
+	EditPost(postID string, post *map[string]interface{}) error
 	DeletePost(post *models.Post) (int64, error)
 	CreatePhoto(photo *models.Photo) error
 	GetPostByID(postID string) (*models.Post, error)
