@@ -6,6 +6,7 @@ import (
 	"callme/models"
 	"errors"
 	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -48,7 +49,8 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	return c.Status(201).JSON(fiber.Map{
-		"token": cookie.Value,
+		"token":  cookie.Value,
+		"userID": user.ID,
 	})
 
 }
@@ -92,6 +94,7 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"token": cookie.Value,
+		"token":  cookie.Value,
+		"userID": user.ID,
 	})
 }
