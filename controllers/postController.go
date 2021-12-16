@@ -226,6 +226,9 @@ func GetPostDetails(c *fiber.Ctx) error {
 	postDTO := DTO.PostDTO{
 		ID:          post.ID,
 		UserID:      post.UserID,
+		UserName:    user.Username,
+		Avatar:      user.Avatar,
+		Bio:         user.Bio,
 		Title:       post.Title,
 		Photos:      post.Photos,
 		Description: post.Description,
@@ -242,7 +245,7 @@ func GetExplorePosts(c *fiber.Ctx) error {
 	user := c.Locals("user").(*models.User)
 
 	//pagination
-	resultsPerPage, err := strconv.Atoi(c.Query("resultsPerPage"))
+	resultsPerPage, _ := strconv.Atoi(c.Query("resultsPerPage"))
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
 		return fiber.ErrBadRequest
