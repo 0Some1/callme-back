@@ -33,6 +33,9 @@ func CreatePost(c *fiber.Ctx) error {
 
 	if form, err := c.MultipartForm(); err == nil {
 		files := form.File["photos"]
+		if files == nil {
+			return fiber.NewError(fiber.StatusBadRequest, "No photos were uploaded")
+		}
 		for _, file := range files {
 			err = lib.ImageValidation(file)
 			if err != nil {
