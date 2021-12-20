@@ -187,7 +187,9 @@ func GetPostsByUserID(c *fiber.Ctx) error {
 		post.PreparePost(c.BaseURL())
 	}
 
-	if user.IsFollowing(otherUser.ID) {
+	_, isFollowing := database.DB.IsFollowing(user.ID, otherUser.ID)
+	//check if user has access to the post
+	if isFollowing {
 		return c.JSON(otherUser.Posts)
 	}
 
@@ -206,9 +208,9 @@ func GetPostDetails(c *fiber.Ctx) error {
 		fmt.Println("GetPostDetails - GetPostByID  ", err)
 		return fiber.ErrNotFound
 	}
-
+	_, isFollowing := database.DB.IsFollowing(user.ID, post.UserID)
 	//check if user has access to the post
-	if !user.IsFollowing(post.UserID) && *post.Private && post.UserID != user.ID {
+	if !isFollowing && *post.Private && post.UserID != user.ID {
 		return fiber.NewError(fiber.StatusForbidden, "Can not get this post")
 	}
 
@@ -279,9 +281,10 @@ func SetComment(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
+	_, isFollowing := database.DB.IsFollowing(user.ID, post.UserID)
 	//check if user has access to the post
-	if !user.IsFollowing(post.UserID) && *post.Private && post.UserID != user.ID {
-		return fiber.NewError(fiber.StatusForbidden, "Can not comment on this post")
+	if !isFollowing && *post.Private && post.UserID != user.ID {
+		return fiber.NewError(fiber.StatusForbidden, "Can not get this post")
 	}
 
 	err = database.DB.AddCommentToPost(comment)
