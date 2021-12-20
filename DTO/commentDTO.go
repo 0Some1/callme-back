@@ -36,6 +36,11 @@ func PrepareCommentDTOs(userID uint, comments []*models.Comment) []*CommentDTO {
 			OwnComment: comments[i].UserID == userID,
 		})
 	}
+	//revers commentDTOs
+	for i, j := 0, len(commentDTOs)-1; i < j; i, j = i+1, j-1 {
+		commentDTOs[i], commentDTOs[j] = commentDTOs[j], commentDTOs[i]
+	}
+
 	return commentDTOs
 }
 
