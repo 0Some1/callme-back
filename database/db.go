@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type postgresDB struct {
@@ -92,7 +93,7 @@ func (p *postgresDB) EditPost(postID uint, post *models.Post) error {
 }
 
 func (p *postgresDB) DeletePost(post *models.Post) (int64, error) {
-	err := p.db.Unscoped().Delete(&post)
+	err := p.db.Unscoped().Select(clause.Associations).Delete(&post)
 	return err.RowsAffected, err.Error
 }
 
