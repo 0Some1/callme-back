@@ -214,7 +214,7 @@ func GetPostDetails(c *fiber.Ctx) error {
 
 	post.PreparePost(c.BaseURL())
 
-	comments := DTO.PrepareCommentDTO(user.ID, post.Comments)
+	comments := DTO.PrepareCommentDTOs(user.ID, post.Comments)
 	hasLiked := user.HasLikedPost(post.Likes)
 
 	postDTO := DTO.PostDTO{
@@ -290,7 +290,8 @@ func SetComment(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	return c.JSON(comment)
+	commentDTO := DTO.PrepareCommentDTO(user.ID, comment)
+	return c.JSON(commentDTO)
 }
 
 //delete a comment from a post
