@@ -280,7 +280,7 @@ func SetComment(c *fiber.Ctx) error {
 	}
 
 	//check if user has access to the post
-	if !user.IsFollowing(post.UserID) && *post.Private {
+	if !user.IsFollowing(post.UserID) && *post.Private && post.UserID != user.ID {
 		return fiber.NewError(fiber.StatusForbidden, "Can not comment on this post")
 	}
 
@@ -290,7 +290,7 @@ func SetComment(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	return c.Status(204).JSON(comment)
+	return c.JSON(comment)
 }
 
 //delete a comment from a post
