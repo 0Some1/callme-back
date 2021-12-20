@@ -290,7 +290,7 @@ func SetComment(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	return c.Status(204).JSON(nil)
+	return c.Status(204).JSON(comment)
 }
 
 //delete a comment from a post
