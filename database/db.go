@@ -87,8 +87,8 @@ func (p *postgresDB) CreatePost(post *models.Post) error {
 	return p.db.Create(post).Error
 }
 
-func (p *postgresDB) EditPost(postID string, post *map[string]interface{}) error {
-	return p.db.Model(&models.Post{}).Where("id = ?", postID).Updates(post).Error
+func (p *postgresDB) EditPost(postID uint, post *models.Post) error {
+	return p.db.Model(&models.Post{}).Where("id = ?", postID).Save(&post).Error
 }
 
 func (p *postgresDB) DeletePost(post *models.Post) (int64, error) {
