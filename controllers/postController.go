@@ -84,11 +84,11 @@ func EditPost(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 	//post validation must be done here!!!
-	err = validator.New().StructPartial(newPost, "Title", "Description")
-	if err != nil {
-		fmt.Println("EditPost - Validation - ", err)
-		return fiber.ErrBadRequest
-	}
+	// err = validator.New().StructPartial(newPost, "Title", "Description")
+	// if err != nil {
+	// 	fmt.Println("EditPost - Validation - ", err)
+	// 	return fiber.ErrBadRequest
+	// }
 
 	oldPost, err := database.DB.GetPostByID(postID)
 	if err != nil {
@@ -101,26 +101,20 @@ func EditPost(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusForbidden, "This user is not the owner of the post.")
 	}
 
-	postDetails := map[string]interface{}{
-		"Title":       newPost.Title,
-		"Description": newPost.Description,
-		"Private":     newPost.Private,
-		"Keywords":    newPost.Keywords,
+	if newPost.Title != "" {
+		oldPost.Title = newPost.Title
 	}
-
-	if postDetails["Title"] == "" {
-		postDetails["Title"] = oldPost.Title
+	if newPost.Description != "" {
+		oldPost.Description = newPost.Description
 	}
-	if postDetails["Description"] == "" {
-		postDetails["Description"] = oldPost.Description
+	if newPost.Keywords != "" {
+		oldPost.Keywords = newPost.Keywords
 	}
-	if postDetails["Keywords"] == "" {
-		postDetails["Keywords"] = oldPost.Keywords
+	if newPost.Private != nil {
+		println(newPost.Private)
+		oldPost.Private = newPost.Private
 	}
-	if postDetails["Private"] == "" {
-		postDetails["Private"] = oldPost.Keywords
-	}
-	err = database.DB.EditPost(postID, &postDetails)
+	err = database.DB.EditPost(oldPost.ID, oldPost)
 	if err != nil {
 		fmt.Println("EditPost - EditPost -", err)
 		return fiber.ErrInternalServerError
@@ -214,7 +208,7 @@ func GetPostDetails(c *fiber.Ctx) error {
 	}
 
 	//check if user has access to the post
-	if !user.IsFollowing(post.UserID) && *post.Private {
+	if !user.IsFollowing(post.UserID) && *post.Private && post.UserID != user.ID {
 		return fiber.NewError(fiber.StatusForbidden, "Can not get this post")
 	}
 
