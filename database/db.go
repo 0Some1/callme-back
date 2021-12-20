@@ -186,6 +186,12 @@ func (p *postgresDB) PreLoadPhotos(post *models.Post) error {
 	return err
 }
 
+func (p *postgresDB) IsFollowing(ownUserID uint, otherUserID uint) (error, bool) {
+	isFollowing := int64(0)
+	err := p.db.Table("user_following").Where("user_id = ? AND following_id = ?", ownUserID, otherUserID).Count(&isFollowing).Error
+	return err, isFollowing != 0
+}
+
 func (p *postgresDB) AcceptRequest(requestID string, user *models.User) error {
 	request := new(models.Request)
 	err := p.db.Where("id = ?", requestID).First(&request).Error
