@@ -208,7 +208,7 @@ func GetPostDetails(c *fiber.Ctx) error {
 	}
 
 	//check if user has access to the post
-	if !user.IsFollowing(post.UserID) && *post.Private {
+	if !user.IsFollowing(post.UserID) && *post.Private && post.UserID != user.ID {
 		return fiber.NewError(fiber.StatusForbidden, "Can not get this post")
 	}
 
