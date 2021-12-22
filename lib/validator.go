@@ -2,22 +2,21 @@ package lib
 
 import (
 	"callme/models"
+
 	"github.com/go-playground/validator/v10"
 )
 
-func ValidateRegister(user models.User) []*ErrorResponse {
-	var errors []*ErrorResponse
+func ValidateRegister(user models.User) ErrorResponse {
+	var errors ErrorResponse
 	validate := validator.New()
 	err := validate.StructPartial(user, "Password", "Email", "Username")
 	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			var element ErrorResponse
-			element.Status = 403
-			element.Description = "validation failed in condition: " + err.Tag()
-			if err.Param() != "" {
-				element.Description = "validation failed condition: " + err.Tag() + " = " + err.Param()
+		errors.Status = 400
+		for i, error := range err.(validator.ValidationErrors) {
+			errors.Description += error.Field() + " is not valid"
+			if i != len(err.(validator.ValidationErrors))-1 {
+				errors.Description += " && "
 			}
-			errors = append(errors, &element)
 		}
 	}
 	return errors
