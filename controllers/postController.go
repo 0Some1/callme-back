@@ -259,6 +259,10 @@ func GetExplorePosts(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
+	for _, post := range posts {
+		post.PreparePost(c.BaseURL())
+	}
+
 	return c.JSON(posts)
 }
 
