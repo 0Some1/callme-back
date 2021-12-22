@@ -22,8 +22,8 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	validationErrors := lib.ValidateRegister(user)
-	if validationErrors != nil {
-		return c.Status(fiber.ErrForbidden.Code).JSON(validationErrors)
+	if validationErrors.Status == 400 {
+		return c.Status(fiber.ErrBadRequest.Code).JSON(validationErrors)
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
@@ -62,6 +62,11 @@ func Login(c *fiber.Ctx) error {
 		fmt.Println("LoginController - BodyParser - ", err)
 		c.Status(fiber.ErrNotAcceptable.Code)
 		return c.JSON(lib.CustomError(fiber.ErrNotAcceptable, "can't read body as JSON!"))
+	}
+
+	validationErrors := lib.ValidateRegister(userIn)
+	if validationErrors.Status == 400 {
+		return c.Status(fiber.ErrBadRequest.Code).JSON(validationErrors)
 	}
 
 	user, err := database.DB.GetUserByEmail(userIn.Email)
