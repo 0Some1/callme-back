@@ -60,7 +60,7 @@ func (p *postgresDB) PreloadPosts(user *models.User) error {
 func (p *postgresDB) LoadExplorePosts(user *models.User, resultsPerPage int, page int) ([]*models.Post, error) {
 	posts := make([]*models.Post, 0)
 	err := p.db.Preload("Photos").
-		Where("id != ?", user.ID).
+		Where("user_id != ?", user.ID).
 		Where("private = false OR user_id IN (SELECT following_id AS user_id FROM user_following WHERE user_id = ?)", user.ID).
 		Order("created_at DESC").
 		Offset(resultsPerPage * (page - 1)).
