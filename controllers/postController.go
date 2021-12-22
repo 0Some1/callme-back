@@ -221,13 +221,18 @@ func GetPostDetails(c *fiber.Ctx) error {
 
 	comments := DTO.PrepareCommentDTOs(user.ID, post.Comments)
 	hasLiked := user.HasLikedPost(post.Likes)
+	postOwner, err := database.DB.GetUserByID(strconv.FormatUint(uint64(post.UserID), 10))
+	if err != nil {
+		fmt.Println("GetPostDetails - GetUserByID  ", err)
+		return fiber.ErrInternalServerError
+	}
 
 	postDTO := DTO.PostDTO{
 		ID:          post.ID,
 		UserID:      post.UserID,
-		UserName:    user.Username,
-		Avatar:      user.Avatar,
-		Bio:         user.Bio,
+		UserName:    postOwner.Username,
+		Avatar:      postOwner.Avatar,
+		Bio:         postOwner.Bio,
 		Title:       post.Title,
 		Photos:      post.Photos,
 		Description: post.Description,
