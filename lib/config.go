@@ -8,11 +8,14 @@ import (
 )
 
 var (
-	DB_HOST     string
-	DB_NAME     string
-	DB_USER     string
-	DB_PASSWORD string
-	DB_PORT     string
+	DB_HOST        string
+	DB_NAME        string
+	DB_USER        string
+	DB_PASSWORD    string
+	DB_PORT        string
+	CLD_API_KEY    string
+	CLD_API_SECRET string
+	CLD_NAME       string
 )
 
 // Config func to get env value
@@ -36,4 +39,7 @@ func init() {
 	DB_USER = Config("DB_USER")
 	DB_PASSWORD = Config("DB_PASSWORD")
 	DB_PORT = Config("DB_PORT")
+	CLD_API_KEY = Config("CLD_API_KEY")
+	CLD_API_SECRET = Config("CLD_API_SECRET")
+	CLD_NAME = Config("CLD_NAME")
 }
