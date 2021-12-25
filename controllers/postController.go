@@ -48,9 +48,14 @@ func CreatePost(c *fiber.Ctx) error {
 				fmt.Println("CreatePost - saveFile ", err)
 				return fiber.ErrInternalServerError
 			}
+			imageUrl, errs := UploadImageToImageKit(fmt.Sprintf("./uploads/post/%s", file.Filename), file.Filename)
+			if errs != nil {
+				fmt.Println("UpdateAvatar - UploadImageToImageKit - ", errs)
+				return fiber.ErrInternalServerError
+			}
 			photoTemp := models.Photo{
 				Name: file.Filename,
-				Path: "/uploads/post/" + file.Filename,
+				Path: imageUrl,
 			}
 			photos = append(photos, &photoTemp)
 			err := database.DB.CreatePhoto(&photoTemp)
@@ -64,7 +69,8 @@ func CreatePost(c *fiber.Ctx) error {
 	}
 
 	for i := 0; i < len(photos); i++ {
-		photos[i].Path = c.BaseURL() + photos[i].Path
+		//photos[i].Path = c.BaseURL() + photos[i].Path
+		photos[i].Path = photos[i].Path
 	}
 	post.Photos = photos
 	err = database.DB.CreatePost(post)
