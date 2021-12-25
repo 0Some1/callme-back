@@ -28,11 +28,7 @@ func GetUser(c *fiber.Ctx) error {
 	var followings int
 	followers = len(user.Followers)
 	followings = len(user.Followings)
-	user.Followers = nil
-	user.Followings = nil
-	if user.Avatar != "" {
-		//user.Avatar = c.BaseURL() + user.Avatar
-	}
+	user.PrepareUser(c.BaseURL())
 
 	return c.JSON(fiber.Map{
 		"id":               user.ID,
@@ -75,11 +71,7 @@ func GetUserByID(c *fiber.Ctx) error {
 	var followings int
 	followers = len(user.Followers)
 	followings = len(user.Followings)
-	user.Followers = nil
-	user.Followings = nil
-	if user.Avatar != "" {
-		//user.Avatar = c.BaseURL() + user.Avatar
-	}
+	user.PrepareUser(c.BaseURL())
 
 	localUser := c.Locals("user").(*models.User)
 	err = database.DB.PreloadFollowings(localUser)
