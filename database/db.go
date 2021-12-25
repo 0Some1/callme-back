@@ -4,6 +4,7 @@ import (
 	"callme/models"
 	"errors"
 	"strconv"
+	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -33,6 +34,7 @@ func (p *postgresDB) GetUserByID(userID string) (*models.User, error) {
 
 func (p *postgresDB) SearchUsers(search string) ([]*models.User, error) {
 	users := make([]*models.User, 0)
+	search = strings.ToLower(search)
 	err := p.db.Where("lower(name) LIKE ?", "%"+search+"%").Or("lower(username) LIKE ?", "%"+search+"%").Find(&users).Error
 	return users, err
 }
