@@ -8,11 +8,12 @@ import (
 )
 
 var (
-	DB_HOST     string
-	DB_NAME     string
-	DB_USER     string
-	DB_PASSWORD string
-	DB_PORT     string
+	DB_HOST          string
+	DB_NAME          string
+	DB_USER          string
+	DB_PASSWORD      string
+	DB_PORT          string
+	IMAGEKIT_API_KEY string
 )
 
 // Config func to get env value
@@ -36,4 +37,5 @@ func init() {
 	DB_USER = Config("DB_USER")
 	DB_PASSWORD = Config("DB_PASSWORD")
 	DB_PORT = Config("DB_PORT")
+	IMAGEKIT_API_KEY = Config("IMAGEKIT_API_KEY")
 }

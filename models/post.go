@@ -15,7 +15,7 @@ type Post struct {
 }
 
 func (p *Post) PreparePost(baseURL string) {
-	for i := range p.Photos {
-		p.Photos[i].AddBaseURL(baseURL)
-	}
+	//for i := range p.Photos {
+	//	p.Photos[i].AddBaseURL(baseURL)
+	//}
 }

@@ -22,7 +22,7 @@ func IsAuthenticated(c *fiber.Ctx) error {
 
 	user, err := database.DB.GetUserByID(id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return c.Status(fiber.ErrNotFound.Code).JSON(lib.CustomError(fiber.ErrNotFound, "User not found"))
+		return c.Status(fiber.ErrUnauthorized.Code).JSON(lib.CustomError(fiber.ErrUnauthorized, "User not found"))
 	}
 	if err != nil {
 		return c.Status(fiber.ErrInternalServerError.Code).JSON(lib.CustomError(fiber.ErrInternalServerError, "Internal server error"))
