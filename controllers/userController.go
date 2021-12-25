@@ -193,8 +193,12 @@ func UpdateAvatar(c *fiber.Ctx) error {
 		fmt.Println("UpdateAvatar - saveFile - ", err)
 		return fiber.ErrInternalServerError
 	}
-
-	user.Avatar = "/uploads/profile/" + file.Filename
+	imageUrl, errs := UploadImageToImageKit(fmt.Sprintf("./uploads/profile/%s", file.Filename), file.Filename)
+	if errs != nil {
+		fmt.Println("UpdateAvatar - UploadImageToImageKit - ", errs)
+		return fiber.ErrInternalServerError
+	}
+	user.Avatar = imageUrl
 	err = database.DB.SaveUser(user)
 	if err != nil {
 		fmt.Println("UpdateAvatar - saveUser - ", err)
@@ -202,7 +206,8 @@ func UpdateAvatar(c *fiber.Ctx) error {
 	}
 
 	return c.Status(201).JSON(fiber.Map{
-		"avatar": c.BaseURL() + user.Avatar,
+		//"avatar": c.BaseURL() + user.Avatar,
+		"avatar": user.Avatar,
 	})
 }
 func SearchUsers(c *fiber.Ctx) error {
@@ -247,7 +252,6 @@ func GetFollowers(c *fiber.Ctx) error {
 	}
 	return c.JSON(user.Followers)
 }
-
 func GetFollowings(c *fiber.Ctx) error {
 	user := c.Locals("user").(*models.User)
 	err := database.DB.PreloadFollowings(user)
