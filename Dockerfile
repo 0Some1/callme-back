@@ -15,7 +15,7 @@ RUN go mod download
 RUN go build -o main .
 
 # Expose port 8080
-EXPOSE 3000
+EXPOSE 8080
 
 # Define the entry point for the container
 CMD ["./main"]
