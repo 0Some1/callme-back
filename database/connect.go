@@ -18,13 +18,13 @@ func Connect() {
 	//	lib.DB_HOST,
 	//	lib.DB_PORT,
 	//	lib.DB_NAME)
-
-	dnsPostgres := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
-		lib.DB_HOST,
+	dnsPostgres := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=verify-full",
 		lib.DB_USER,
 		lib.DB_PASSWORD,
+		lib.DB_HOST,
+		lib.DB_PORT,
 		lib.DB_NAME,
-		lib.DB_PORT)
+	)
 
 	database, err := gorm.Open(postgres.Open(dnsPostgres), &gorm.Config{})
 	if err != nil {
@@ -35,12 +35,15 @@ func Connect() {
 }
 
 func migration(db *gorm.DB) {
-	db.AutoMigrate(
+	err := db.AutoMigrate(
 		&models.User{},
 		&models.Post{},
 		&models.Request{},
 		&models.Comment{},
 		&models.Photo{},
 	)
+	if err != nil {
+		panic("could not migrate to database")
+	}
 
 }

@@ -2,7 +2,7 @@ package lib
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
 
@@ -12,7 +12,7 @@ func GenerateJwt(issuer string) (string, error) {
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    issuer,
-		ExpiresAt: time.Now().Add(time.Hour * 99999).Unix(), // it will be last for 1 day
+		ExpiresAt: time.Now().Add(time.Hour * 99999).Unix(),
 	})
 
 	token, err := claims.SignedString([]byte(SecretKey))
